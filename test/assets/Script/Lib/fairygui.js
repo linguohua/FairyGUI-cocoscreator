@@ -1,19 +1,32 @@
-window.fgui = {};
-window.__extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+Window.fgui = {}
+Window.__extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({
+                    __proto__: []
+                }
+                instanceof Array && function (d, b) {
+                    d.__proto__ = b;
+                }) ||
+            function (d, b) {
+                for (var p in b)
+                    if (b.hasOwnProperty(p)) d[p] = b[p];
+            };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
-        function __() { this.constructor = d; }
+
+        function __() {
+            this.constructor = d;
+        }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 
 (function (fgui) {
     var AsyncOperation = /** @class */ (function () {
-        function AsyncOperation() {
-        }
+        function AsyncOperation() {}
         AsyncOperation.prototype.createObject = function (pkgName, resName) {
             if (this._node)
                 throw 'Already running';
@@ -23,8 +36,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (!pi)
                     throw new Error("resource not found: " + resName);
                 this.internalCreateObject(pi);
-            }
-            else
+            } else
                 throw new Error("package not found: " + pkgName);
         };
         AsyncOperation.prototype.createObjectFromURL = function (url) {
@@ -58,6 +70,7 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.AsyncOperation = AsyncOperation;
     var AsyncOperationRunner = /** @class */ (function (_super) {
         __extends(AsyncOperationRunner, _super);
+
         function AsyncOperationRunner() {
             var _this = _super.call(this) || this;
             _this._itemList = new Array();
@@ -108,10 +121,9 @@ window.__extends = (this && this.__extends) || (function () {
                     di = new DisplayListItem(pi, type);
                     if (pi != null && pi.type == fgui.PackageItemType.Component)
                         di.childCount = this.collectComponentChildren(pi);
-                }
-                else {
+                } else {
                     di = new DisplayListItem(null, type);
-                    if (type == fgui.ObjectType.List)
+                    if (type == fgui.ObjectType.List) //list
                         di.listItemCount = this.collectListChildren(buffer);
                 }
                 this._itemList.push(di);
@@ -168,18 +180,16 @@ window.__extends = (this && this.__extends) || (function () {
                         poolStart = this._objectPool.length - di.childCount - 1;
                         obj.constructFromResource2(this._objectPool, poolStart);
                         this._objectPool.splice(poolStart, di.childCount);
-                    }
-                    else {
+                    } else {
                         obj.constructFromResource();
                     }
                     fgui.UIPackage._constructing--;
-                }
-                else {
+                } else {
                     obj = fgui.UIObjectFactory.newObject2(di.type);
                     this._objectPool.push(obj);
                     if (di.type == fgui.ObjectType.List && di.listItemCount > 0) {
                         poolStart = this._objectPool.length - di.listItemCount - 1;
-                        for (k = 0; k < di.listItemCount; k++)
+                        for (k = 0; k < di.listItemCount; k++) //把他们都放到pool里，这样GList在创建时就不需要创建对象了
                             obj.itemPool.returnObject(this._objectPool[k + poolStart]);
                         this._objectPool.splice(poolStart, di.listItemCount);
                     }
@@ -207,6 +217,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var Controller = /** @class */ (function (_super) {
         __extends(Controller, _super);
+
         function Controller() {
             var _this = _super.call(this) || this;
             _this._selectedIndex = 0;
@@ -218,8 +229,7 @@ window.__extends = (this && this.__extends) || (function () {
             _this._previousIndex = -1;
             return _this;
         }
-        Controller.prototype.dispose = function () {
-        };
+        Controller.prototype.dispose = function () {};
         Object.defineProperty(Controller.prototype, "selectedIndex", {
             get: function () {
                 return this._selectedIndex;
@@ -308,7 +318,9 @@ window.__extends = (this && this.__extends) || (function () {
             return this._pageNames[index];
         };
         Controller.prototype.addPage = function (name) {
-            if (name === void 0) { name = ""; }
+            if (name === void 0) {
+                name = "";
+            }
             this.addPageAt(name, this._pageIds.length);
         };
         Controller.prototype.addPageAt = function (name, index) {
@@ -316,8 +328,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (index == this._pageIds.length) {
                 this._pageIds.push(nid);
                 this._pageNames.push(name);
-            }
-            else {
+            } else {
                 this._pageIds.splice(index, 0, nid);
                 this._pageNames.splice(index, 0, name);
             }
@@ -507,7 +518,7 @@ window.__extends = (this && this.__extends) || (function () {
             }
         };
         DragDropManager.prototype.onDragEnd = function () {
-            if (this._agent.parent == null)
+            if (this._agent.parent == null) //cancelled
                 return;
             fgui.GRoot.inst.removeChild(this._agent);
             var sourceData = this._sourceData;
@@ -937,8 +948,7 @@ window.__extends = (this && this.__extends) || (function () {
         GObject.prototype.makeFullScreen = function () {
             this.setSize(fgui.GRoot.inst.width, fgui.GRoot.inst.height);
         };
-        GObject.prototype.ensureSizeCorrect = function () {
-        };
+        GObject.prototype.ensureSizeCorrect = function () {};
         Object.defineProperty(GObject.prototype, "actualWidth", {
             get: function () {
                 return this.width * Math.abs(this._node.scaleX);
@@ -1031,8 +1041,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this.node.anchorX != xv || this.node.anchorY != 1 - yv) {
                 this._pivotAsAnchor = asAnchor;
                 this.node.setAnchorPoint(xv, 1 - yv);
-            }
-            else if (this._pivotAsAnchor != asAnchor) {
+            } else if (this._pivotAsAnchor != asAnchor) {
                 this._pivotAsAnchor = asAnchor;
                 this.handlePositionChanged();
             }
@@ -1098,8 +1107,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this._node.angle = value;
                         this.updateGear(3);
                     }
-                }
-                else if (this._node.rotation != value) {
+                } else if (this._node.rotation != value) {
                     this._node.rotation = value;
                     this.updateGear(3);
                 }
@@ -1160,8 +1168,7 @@ window.__extends = (this && this.__extends) || (function () {
             enumerable: true,
             configurable: true
         });
-        GObject.prototype.requestFocus = function () {
-        };
+        GObject.prototype.requestFocus = function () {};
         Object.defineProperty(GObject.prototype, "tooltips", {
             get: function () {
                 return this._tooltips;
@@ -1281,8 +1288,7 @@ window.__extends = (this && this.__extends) || (function () {
                 var ret = gearDisplay.addLock();
                 this.checkGearDisplay();
                 return ret;
-            }
-            else
+            } else
                 return 0;
         };
         GObject.prototype.releaseDisplayLock = function (token) {
@@ -1493,8 +1499,7 @@ window.__extends = (this && this.__extends) || (function () {
             get: function () {
                 return null;
             },
-            set: function (value) {
-            },
+            set: function (value) {},
             enumerable: true,
             configurable: true
         });
@@ -1502,8 +1507,7 @@ window.__extends = (this && this.__extends) || (function () {
             get: function () {
                 return null;
             },
-            set: function (value) {
-            },
+            set: function (value) {},
             enumerable: true,
             configurable: true
         });
@@ -1516,14 +1520,10 @@ window.__extends = (this && this.__extends) || (function () {
             this._node = null;
             n.destroy();
         };
-        GObject.prototype.onEnable = function () {
-        };
-        GObject.prototype.onDisable = function () {
-        };
-        GObject.prototype.onUpdate = function () {
-        };
-        GObject.prototype.onDestroy = function () {
-        };
+        GObject.prototype.onEnable = function () {};
+        GObject.prototype.onDisable = function () {};
+        GObject.prototype.onUpdate = function () {};
+        GObject.prototype.onDestroy = function () {};
         GObject.prototype.onClick = function (listener, target) {
             this._node.on(fgui.Event.CLICK, listener, target);
         };
@@ -1677,8 +1677,7 @@ window.__extends = (this && this.__extends) || (function () {
         GObject.prototype.handleSizeChanged = function () {
             this._node.setContentSize(this._width, this._height);
         };
-        GObject.prototype.handleGrayedChanged = function () {
-        };
+        GObject.prototype.handleGrayedChanged = function () {};
         GObject.prototype.handleVisibleChanged = function () {
             this._node.active = this._finalVisible;
             if (this instanceof fgui.GGroup)
@@ -1695,8 +1694,7 @@ window.__extends = (this && this.__extends) || (function () {
             else
                 return null;
         };
-        GObject.prototype.constructFromResource = function () {
-        };
+        GObject.prototype.constructFromResource = function () {};
         GObject.prototype.setup_beforeAdd = function (buffer, beginPos) {
             buffer.seek(beginPos, 0);
             buffer.skip(5);
@@ -1775,19 +1773,16 @@ window.__extends = (this && this.__extends) || (function () {
         //toolTips support
         GObject.prototype.onRollOver = function () {
             this.root.showTooltips(this.tooltips);
-        };
-        ;
+        };;
         GObject.prototype.onRollOut = function () {
             this.root.hideTooltips();
-        };
-        ;
+        };;
         GObject.prototype.initDrag = function () {
             if (this._draggable) {
                 this.on(fgui.Event.TOUCH_BEGIN, this.onTouchBegin_0, this);
                 this.on(fgui.Event.TOUCH_MOVE, this.onTouchMove_0, this);
                 this.on(fgui.Event.TOUCH_END, this.onTouchEnd_0, this);
-            }
-            else {
+            } else {
                 this.off(fgui.Event.TOUCH_BEGIN, this.onTouchBegin_0, this);
                 this.off(fgui.Event.TOUCH_MOVE, this.onTouchMove_0, this);
                 this.off(fgui.Event.TOUCH_END, this.onTouchEnd_0, this);
@@ -1827,8 +1822,8 @@ window.__extends = (this && this.__extends) || (function () {
         GObject.prototype.onTouchMove_0 = function (evt) {
             if (GObject.draggingObject != this && this._draggable && this._dragTesting) {
                 var sensitivity = fgui.UIConfig.touchDragSensitivity;
-                if (Math.abs(this._dragStartPoint.x - evt.pos.x) < sensitivity
-                    && Math.abs(this._dragStartPoint.y - evt.pos.y) < sensitivity)
+                if (Math.abs(this._dragStartPoint.x - evt.pos.x) < sensitivity &&
+                    Math.abs(this._dragStartPoint.y - evt.pos.y) < sensitivity)
                     return;
                 this._dragTesting = false;
                 GObject.sDragQuery = true;
@@ -1882,6 +1877,7 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.GObject = GObject;
     var GObjectPartner = /** @class */ (function (_super) {
         __extends(GObjectPartner, _super);
+
         function GObjectPartner() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._emitDisplayEvents = false;
@@ -1919,6 +1915,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GComponent = /** @class */ (function (_super) {
         __extends(GComponent, _super);
+
         function GComponent() {
             var _this = _super.call(this) || this;
             _this._sortingChildCount = 0;
@@ -1977,16 +1974,14 @@ window.__extends = (this && this.__extends) || (function () {
             if (index >= 0 && index <= numChildren) {
                 if (child.parent == this) {
                     this.setChildIndex(child, index);
-                }
-                else {
+                } else {
                     child.removeFromParent();
                     child._parent = this;
                     var cnt = this._children.length;
                     if (child.sortingOrder != 0) {
                         this._sortingChildCount++;
                         index = this.getInsertPosForSortingChild(child);
-                    }
-                    else if (this._sortingChildCount > 0) {
+                    } else if (this._sortingChildCount > 0) {
                         if (index > (cnt - this._sortingChildCount))
                             index = cnt - this._sortingChildCount;
                     }
@@ -1998,8 +1993,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.setBoundsChangedFlag();
                 }
                 return child;
-            }
-            else {
+            } else {
                 throw "Invalid child index";
             }
         };
@@ -2039,8 +2033,7 @@ window.__extends = (this && this.__extends) || (function () {
                     child.node.parent = null;
                 this.setBoundsChangedFlag();
                 return child;
-            }
-            else {
+            } else {
                 throw "Invalid child index";
             }
         };
@@ -2101,7 +2094,7 @@ window.__extends = (this && this.__extends) || (function () {
             var oldIndex = this._children.indexOf(child);
             if (oldIndex == -1)
                 throw "Not a child of this container";
-            if (child.sortingOrder != 0)
+            if (child.sortingOrder != 0) //no effect
                 return;
             var cnt = this._children.length;
             if (this._sortingChildCount > 0) {
@@ -2114,7 +2107,7 @@ window.__extends = (this && this.__extends) || (function () {
             var oldIndex = this._children.indexOf(child);
             if (oldIndex == -1)
                 throw "Not a child of this container";
-            if (child.sortingOrder != 0)
+            if (child.sortingOrder != 0) //no effect
                 return oldIndex;
             var cnt = this._children.length;
             if (this._sortingChildCount > 0) {
@@ -2234,37 +2227,34 @@ window.__extends = (this && this.__extends) || (function () {
                 return;
             var child;
             switch (this._childrenRenderOrder) {
-                case fgui.ChildrenRenderOrder.Ascent:
-                    {
-                        var j = 0;
-                        for (var i = 0; i < cnt; i++) {
-                            child = this._children[i];
-                            child.node.setSiblingIndex(j++);
-                        }
+                case fgui.ChildrenRenderOrder.Ascent: {
+                    var j = 0;
+                    for (var i = 0; i < cnt; i++) {
+                        child = this._children[i];
+                        child.node.setSiblingIndex(j++);
                     }
-                    break;
-                case fgui.ChildrenRenderOrder.Descent:
-                    {
-                        var j = 0;
-                        for (var i = cnt - 1; i >= 0; i--) {
-                            child = this._children[i];
-                            child.node.setSiblingIndex(j++);
-                        }
-                    }
-                    break;
-                case fgui.ChildrenRenderOrder.Arch:
-                    {
-                        var j = 0;
-                        for (var i = 0; i < this._apexIndex; i++) {
-                            child = this._children[i];
-                            child.node.setSiblingIndex(j++);
-                        }
-                        for (var i = cnt - 1; i >= this._apexIndex; i--) {
-                            child = this._children[i];
-                            child.node.setSiblingIndex(j++);
-                        }
-                    }
-                    break;
+                }
+                break;
+            case fgui.ChildrenRenderOrder.Descent: {
+                var j = 0;
+                for (var i = cnt - 1; i >= 0; i--) {
+                    child = this._children[i];
+                    child.node.setSiblingIndex(j++);
+                }
+            }
+            break;
+            case fgui.ChildrenRenderOrder.Arch: {
+                var j = 0;
+                for (var i = 0; i < this._apexIndex; i++) {
+                    child = this._children[i];
+                    child.node.setSiblingIndex(j++);
+                }
+                for (var i = cnt - 1; i >= this._apexIndex; i--) {
+                    child = this._children[i];
+                    child.node.setSiblingIndex(j++);
+                }
+            }
+            break;
             }
         };
         GComponent.prototype.applyController = function (c) {
@@ -2288,14 +2278,14 @@ window.__extends = (this && this.__extends) || (function () {
             var cnt = this._children.length;
             var i;
             var child;
-            var myIndex = -1, maxIndex = -1;
+            var myIndex = -1,
+                maxIndex = -1;
             for (i = 0; i < cnt; i++) {
                 child = this._children[i];
                 if (child == obj) {
                     myIndex = i;
-                }
-                else if ((child instanceof fgui.GButton)
-                    && child.relatedController == c) {
+                } else if ((child instanceof fgui.GButton) &&
+                    child.relatedController == c) {
                     if (i > maxIndex)
                         maxIndex = i;
                 }
@@ -2320,13 +2310,11 @@ window.__extends = (this && this.__extends) || (function () {
         };
         GComponent.prototype.isChildInView = function (child) {
             if (this._rectMask != null) {
-                return child.x + child.width >= 0 && child.x <= this.width
-                    && child.y + child.height >= 0 && child.y <= this.height;
-            }
-            else if (this._scrollPane != null) {
+                return child.x + child.width >= 0 && child.x <= this.width &&
+                    child.y + child.height >= 0 && child.y <= this.height;
+            } else if (this._scrollPane != null) {
                 return this._scrollPane.isChildInView(child);
-            }
-            else
+            } else
                 return true;
         };
         GComponent.prototype.getFirstChildInView = function () {
@@ -2437,8 +2425,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._scrollPane.adjustMaskContainer();
                 else
                     this._container.setPosition(0, 0);
-            }
-            else if (this._customMask) {
+            } else if (this._customMask) {
                 if (this._scrollPane)
                     this._container.parent.parent = this._node;
                 else
@@ -2456,8 +2443,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._maskContent instanceof fgui.GImage) {
                 this._customMask.type = cc.Mask.Type.IMAGE_STENCIL;
                 this._customMask.spriteFrame = this._maskContent._content.spriteFrame;
-            }
-            else {
+            } else {
                 if (this._maskContent.type == fgui.GraphType.Ellipse)
                     this._customMask.type = cc.Mask.Type.ELLIPSE;
                 else
@@ -2596,8 +2582,7 @@ window.__extends = (this && this.__extends) || (function () {
                     return this;
                 else
                     return null;
-            }
-            else
+            } else
                 return null;
         };
         GComponent.prototype.setBoundsChangedFlag = function () {
@@ -2637,11 +2622,15 @@ window.__extends = (this && this.__extends) || (function () {
                 this.updateBounds();
         };
         GComponent.prototype.updateBounds = function () {
-            var ax = 0, ay = 0, aw = 0, ah = 0;
+            var ax = 0,
+                ay = 0,
+                aw = 0,
+                ah = 0;
             var len = this._children.length;
             if (len > 0) {
                 ax = Number.POSITIVE_INFINITY, ay = Number.POSITIVE_INFINITY;
-                var ar = Number.NEGATIVE_INFINITY, ab = Number.NEGATIVE_INFINITY;
+                var ar = Number.NEGATIVE_INFINITY,
+                    ab = Number.NEGATIVE_INFINITY;
                 var tmp = 0;
                 var i = 0;
                 for (var i = 0; i < len; i++) {
@@ -2665,7 +2654,9 @@ window.__extends = (this && this.__extends) || (function () {
             this.setBounds(ax, ay, aw, ah);
         };
         GComponent.prototype.setBounds = function (ax, ay, aw, ah) {
-            if (ah === void 0) { ah = 0; }
+            if (ah === void 0) {
+                ah = 0;
+            }
             this._boundsChanged = false;
             if (this._scrollPane)
                 this._scrollPane.setContentSize(Math.round(ax + aw), Math.round(ay + ah));
@@ -2722,12 +2713,11 @@ window.__extends = (this && this.__extends) || (function () {
                         if (i == 0) {
                             yValue = 0;
                             break;
-                        }
-                        else {
+                        } else {
                             prev = this._children[i - 1];
-                            if (yValue < prev.y + prev.actualHeight / 2)
+                            if (yValue < prev.y + prev.actualHeight / 2) //top half part
                                 yValue = prev.y;
-                            else
+                            else //bottom half part
                                 yValue = obj.y;
                             break;
                         }
@@ -2745,12 +2735,11 @@ window.__extends = (this && this.__extends) || (function () {
                         if (i == 0) {
                             xValue = 0;
                             break;
-                        }
-                        else {
+                        } else {
                             prev = this._children[i - 1];
-                            if (xValue < prev.x + prev.actualWidth / 2)
+                            if (xValue < prev.x + prev.actualWidth / 2) //top half part
                                 xValue = prev.x;
-                            else
+                            else //bottom half part
                                 xValue = obj.x;
                             break;
                         }
@@ -2764,12 +2753,13 @@ window.__extends = (this && this.__extends) || (function () {
             return resultPoint;
         };
         GComponent.prototype.childSortingOrderChanged = function (child, oldValue, newValue) {
-            if (newValue === void 0) { newValue = 0; }
+            if (newValue === void 0) {
+                newValue = 0;
+            }
             if (newValue == 0) {
                 this._sortingChildCount--;
                 this.setChildIndex(child, this._children.length);
-            }
-            else {
+            } else {
                 if (oldValue == 0)
                     this._sortingChildCount++;
                 var oldIndex = this._children.indexOf(child);
@@ -2827,8 +2817,7 @@ window.__extends = (this && this.__extends) || (function () {
                 buffer.seek(0, 7);
                 this.setupScroll(buffer);
                 buffer.position = savedPos;
-            }
-            else
+            } else
                 this.setupOverflow(overflow);
             if (buffer.readBool())
                 buffer.skip(8);
@@ -2870,8 +2859,7 @@ window.__extends = (this && this.__extends) || (function () {
                         child = fgui.UIObjectFactory.newObject(pi);
                         child.packageItem = pi;
                         child.constructFromResource();
-                    }
-                    else
+                    } else
                         child = fgui.UIObjectFactory.newObject2(type);
                 }
                 child._underConstruct = true;
@@ -2937,10 +2925,8 @@ window.__extends = (this && this.__extends) || (function () {
                 this.constructExtension(buffer);
             this.onConstruct();
         };
-        GComponent.prototype.constructExtension = function (buffer) {
-        };
-        GComponent.prototype.onConstruct = function () {
-        };
+        GComponent.prototype.constructExtension = function (buffer) {};
+        GComponent.prototype.onConstruct = function () {};
         GComponent.prototype.setup_afterAdd = function (buffer, beginPos) {
             _super.prototype.setup_afterAdd.call(this, buffer, beginPos);
             buffer.seek(beginPos, 4);
@@ -2974,6 +2960,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GButton = /** @class */ (function (_super) {
         __extends(GButton, _super);
+
         function GButton() {
             var _this = _super.call(this) || this;
             _this._node.name = "GButton";
@@ -3118,15 +3105,14 @@ window.__extends = (this && this.__extends) || (function () {
                         if (this._iconObject != null)
                             this._iconObject.icon = str;
                     }
-                    if (this._relatedController
-                        && this._parent
-                        && !this._parent._buildingDisplayList) {
+                    if (this._relatedController &&
+                        this._parent &&
+                        !this._parent._buildingDisplayList) {
                         if (this._selected) {
                             this._relatedController.selectedPageId = this._relatedPageId;
                             if (this._relatedController.autoRadioGroupDepth)
                                 this._parent.adjustRadioGroupDepth(this, this._relatedController);
-                        }
-                        else if (this._mode == fgui.ButtonMode.Check && this._relatedController.selectedPageId == this._relatedPageId)
+                        } else if (this._mode == fgui.ButtonMode.Check && this._relatedController.selectedPageId == this._relatedPageId)
                             this._relatedController.oppositePageId = this._relatedPageId;
                     }
                 }
@@ -3216,23 +3202,20 @@ window.__extends = (this && this.__extends) || (function () {
                         if (obj["color"] != undefined && !(obj instanceof fgui.GTextField))
                             obj.color = this._downColor;
                     }
-                }
-                else {
+                } else {
                     for (var i = 0; i < cnt; i++) {
                         var obj = this.getChildAt(i);
                         if (obj["color"] != undefined && !(obj instanceof fgui.GTextField))
                             obj.color = cc.Color.WHITE;
                     }
                 }
-            }
-            else if (this._downEffect == 2) {
+            } else if (this._downEffect == 2) {
                 if (val == GButton.DOWN || val == GButton.SELECTED_OVER || val == GButton.SELECTED_DISABLED) {
                     if (!this._downScaled) {
                         this._downScaled = true;
                         this.setScale(this.scaleX * this._downEffectValue, this.scaleY * this._downEffectValue);
                     }
-                }
-                else {
+                } else {
                     if (this._downScaled) {
                         this._downScaled = false;
                         this.setScale(this.scaleX / this._downEffectValue, this.scaleY / this._downEffectValue);
@@ -3246,8 +3229,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.setState(GButton.SELECTED_DISABLED);
                 else
                     this.setState(GButton.DISABLED);
-            }
-            else {
+            } else {
                 if (this._selected)
                     this.setState(this._over ? GButton.SELECTED_OVER : GButton.DOWN);
                 else
@@ -3266,13 +3248,11 @@ window.__extends = (this && this.__extends) || (function () {
                         this.setState(GButton.SELECTED_DISABLED);
                     else
                         this.setState(GButton.DISABLED);
-                }
-                else if (this._selected)
+                } else if (this._selected)
                     this.setState(GButton.DOWN);
                 else
                     this.setState(GButton.UP);
-            }
-            else
+            } else
                 _super.prototype.handleGrayedChanged.call(this);
         };
         GButton.prototype.constructExtension = function (buffer) {
@@ -3389,12 +3369,11 @@ window.__extends = (this && this.__extends) || (function () {
                         this.setState(GButton.OVER);
                     else
                         this.setState(GButton.UP);
-                }
-                else {
-                    if (!this._over
-                        && this._buttonController != null
-                        && (this._buttonController.selectedPage == GButton.OVER
-                            || this._buttonController.selectedPage == GButton.SELECTED_OVER)) {
+                } else {
+                    if (!this._over &&
+                        this._buttonController != null &&
+                        (this._buttonController.selectedPage == GButton.OVER ||
+                            this._buttonController.selectedPage == GButton.SELECTED_OVER)) {
                         this.setCurrentState();
                     }
                 }
@@ -3414,14 +3393,12 @@ window.__extends = (this && this.__extends) || (function () {
                     this.selected = !this._selected;
                     this._node.emit(fgui.Event.STATUS_CHANGED, this);
                 }
-            }
-            else if (this._mode == fgui.ButtonMode.Radio) {
+            } else if (this._mode == fgui.ButtonMode.Radio) {
                 if (this._changeStateOnClick && !this._selected) {
                     this.selected = true;
                     this._node.emit(fgui.Event.STATUS_CHANGED, this);
                 }
-            }
-            else {
+            } else {
                 if (this._relatedController)
                     this._relatedController.selectedPageId = this._relatedPageId;
             }
@@ -3440,6 +3417,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GComboBox = /** @class */ (function (_super) {
         __extends(GComboBox, _super);
+
         function GComboBox() {
             var _this = _super.call(this) || this;
             _this._visibleItemCount = 0;
@@ -3552,8 +3530,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.text = this._items[this._selectedIndex];
                     if (this._icons != null && this._selectedIndex < this._icons.length)
                         this.icon = this._icons[this._selectedIndex];
-                }
-                else {
+                } else {
                     this.text = "";
                     if (this._icons != null)
                         this.icon = null;
@@ -3601,8 +3578,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.text = this._items[this._selectedIndex];
                     if (this._icons != null && this._selectedIndex < this._icons.length)
                         this.icon = this._icons[this._selectedIndex];
-                }
-                else {
+                } else {
                     this.text = "";
                     if (this._icons != null)
                         this.icon = null;
@@ -3682,8 +3658,8 @@ window.__extends = (this && this.__extends) || (function () {
                 this.selectedIndex = c.selectedIndex;
         };
         GComboBox.prototype.updateSelectionController = function () {
-            if (this._selectionController != null && !this._selectionController.changing
-                && this._selectedIndex < this._selectionController.pageCount) {
+            if (this._selectionController != null && !this._selectionController.changing &&
+                this._selectedIndex < this._selectionController.pageCount) {
                 var c = this._selectionController;
                 this._selectionController = null;
                 c.selectedIndex = this._selectedIndex;
@@ -3725,12 +3701,10 @@ window.__extends = (this && this.__extends) || (function () {
             if (str != null) {
                 this.text = str;
                 this._selectedIndex = this._items.indexOf(str);
-            }
-            else if (this._items.length > 0) {
+            } else if (this._items.length > 0) {
                 this._selectedIndex = 0;
                 this.text = this._items[0];
-            }
-            else
+            } else
                 this._selectedIndex = -1;
             str = buffer.readS();
             if (str != null)
@@ -3789,8 +3763,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._selectedIndex >= 0) {
                 this.text = this._items[this._selectedIndex];
                 this.icon = (this._icons != null && this._selectedIndex < this._icons.length) ? this._icons[this._selectedIndex] : null;
-            }
-            else {
+            } else {
                 this.text = "";
                 if (this._icons != null)
                     this.icon = null;
@@ -3840,6 +3813,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GGraph = /** @class */ (function (_super) {
         __extends(GGraph, _super);
+
         function GGraph() {
             var _this = _super.call(this) || this;
             _this._type = 0;
@@ -3904,11 +3878,9 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._type == 1) {
                 if (this._cornerRadius) {
                     ctx.roundRect(0, -h, w, h, this._cornerRadius[0] * 2);
-                }
-                else
+                } else
                     ctx.rect(0, -h, w, h);
-            }
-            else
+            } else
                 ctx.ellipse(w / 2, -h / 2, w / 2, h / 2);
             if (this._lineSize != 0)
                 ctx.stroke();
@@ -3943,6 +3915,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GGroup = /** @class */ (function (_super) {
         __extends(GGroup, _super);
+
         function GGroup() {
             var _this = _super.call(this) || this;
             _this._layout = 0;
@@ -4021,8 +3994,10 @@ window.__extends = (this && this.__extends) || (function () {
             var cnt = this._parent.numChildren;
             var i;
             var child;
-            var ax = Number.POSITIVE_INFINITY, ay = Number.POSITIVE_INFINITY;
-            var ar = Number.NEGATIVE_INFINITY, ab = Number.NEGATIVE_INFINITY;
+            var ax = Number.POSITIVE_INFINITY,
+                ay = Number.POSITIVE_INFINITY;
+            var ar = Number.NEGATIVE_INFINITY,
+                ab = Number.NEGATIVE_INFINITY;
             var tmp;
             var empty = true;
             for (i = 0; i < cnt; i++) {
@@ -4048,8 +4023,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this.setPosition(ax, ay);
                 this._updating = 2;
                 this.setSize(ar - ax, ab - ay);
-            }
-            else {
+            } else {
                 this._updating = 2;
                 this.setSize(0, 0);
             }
@@ -4076,8 +4050,7 @@ window.__extends = (this && this.__extends) || (function () {
                 }
                 if (!this._percentReady)
                     this.updatePercent();
-            }
-            else if (this._layout == fgui.GroupLayoutType.Vertical) {
+            } else if (this._layout == fgui.GroupLayoutType.Vertical) {
                 var curY = NaN;
                 cnt = this._parent.numChildren;
                 for (i = 0; i < cnt; i++) {
@@ -4118,8 +4091,7 @@ window.__extends = (this && this.__extends) || (function () {
                     else
                         child._sizePercentInGroup = 0;
                 }
-            }
-            else {
+            } else {
                 for (i = 0; i < cnt; i++) {
                     child = this._parent.getChildAt(i);
                     if (child.group != this)
@@ -4193,29 +4165,27 @@ window.__extends = (this && this.__extends) || (function () {
                     child.setSize(nw, child._rawHeight + dh, true);
                     remainSize -= child.width;
                     if (last == i) {
-                        if (remainSize >= 1) {
+                        if (remainSize >= 1) //可能由于有些元件有宽度限制，导致无法铺满
+                        {
                             for (j = 0; j <= i; j++) {
                                 child = this._parent.getChildAt(j);
                                 if (child.group != this)
                                     continue;
                                 if (!found) {
                                     nw = child.width + remainSize;
-                                    if ((child.maxWidth == 0 || nw < child.maxWidth)
-                                        && (child.minWidth == 0 || nw > child.minWidth)) {
+                                    if ((child.maxWidth == 0 || nw < child.maxWidth) &&
+                                        (child.minWidth == 0 || nw > child.minWidth)) {
                                         child.setSize(nw, child.height, true);
                                         found = true;
                                     }
-                                }
-                                else
+                                } else
                                     child.x += remainSize;
                             }
                         }
-                    }
-                    else
+                    } else
                         curX += (child.width + this._columnGap);
                 }
-            }
-            else if (this._layout == fgui.GroupLayoutType.Vertical) {
+            } else if (this._layout == fgui.GroupLayoutType.Vertical) {
                 remainSize = lineSize = this.height - (numChildren - 1) * this._lineGap;
                 var curY = NaN;
                 var nh;
@@ -4234,25 +4204,24 @@ window.__extends = (this && this.__extends) || (function () {
                     child.setSize(child._rawWidth + dw, nh, true);
                     remainSize -= child.height;
                     if (last == i) {
-                        if (remainSize >= 1) {
+                        if (remainSize >= 1) //可能由于有些元件有宽度限制，导致无法铺满
+                        {
                             for (j = 0; j <= i; j++) {
                                 child = this._parent.getChildAt(j);
                                 if (child.group != this)
                                     continue;
                                 if (!found) {
                                     nh = child.height + remainSize;
-                                    if ((child.maxHeight == 0 || nh < child.maxHeight)
-                                        && (child.minHeight == 0 || nh > child.minHeight)) {
+                                    if ((child.maxHeight == 0 || nh < child.maxHeight) &&
+                                        (child.minHeight == 0 || nh > child.minHeight)) {
                                         child.setSize(child.width, nh, true);
                                         found = true;
                                     }
-                                }
-                                else
+                                } else
                                     child.y += remainSize;
                             }
                         }
-                    }
-                    else
+                    } else
                         curY += (child.height + this._lineGap);
                 }
             }
@@ -4298,6 +4267,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GImage = /** @class */ (function (_super) {
         __extends(GImage, _super);
+
         function GImage() {
             var _this = _super.call(this) || this;
             _this._node.name = "GImage";
@@ -4406,6 +4376,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GLabel = /** @class */ (function (_super) {
         __extends(GLabel, _super);
+
         function GLabel() {
             var _this = _super.call(this) || this;
             _this._node.name = "GLabel";
@@ -4556,8 +4527,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     if (buffer.readBool())
                         input.password = true;
-                }
-                else
+                } else
                     buffer.skip(13);
             }
         };
@@ -4569,6 +4539,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GList = /** @class */ (function (_super) {
         __extends(GList, _super);
+
         function GList() {
             var _this = _super.call(this) || this;
             _this.scrollItemToViewOnClick = true;
@@ -4775,7 +4746,9 @@ window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         GList.prototype.getFromPool = function (url) {
-            if (url === void 0) { url = null; }
+            if (url === void 0) {
+                url = null;
+            }
             if (!url)
                 url = this._defaultItem;
             var obj = this._pool.getObject(url);
@@ -4787,7 +4760,9 @@ window.__extends = (this && this.__extends) || (function () {
             this._pool.returnObject(obj);
         };
         GList.prototype.addChildAt = function (child, index) {
-            if (index === void 0) { index = 0; }
+            if (index === void 0) {
+                index = 0;
+            }
             _super.prototype.addChildAt.call(this, child, index);
             if (child instanceof fgui.GButton) {
                 var button = child;
@@ -4798,13 +4773,17 @@ window.__extends = (this && this.__extends) || (function () {
             return child;
         };
         GList.prototype.addItem = function (url) {
-            if (url === void 0) { url = null; }
+            if (url === void 0) {
+                url = null;
+            }
             if (!url)
                 url = this._defaultItem;
             return this.addChild(fgui.UIPackage.createObjectFromURL(url));
         };
         GList.prototype.addItemFromPool = function (url) {
-            if (url === void 0) { url = null; }
+            if (url === void 0) {
+                url = null;
+            }
             return this.addChild(this.getFromPool(url));
         };
         GList.prototype.removeChildAt = function (index, dispose) {
@@ -4836,16 +4815,15 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._virtual) {
                     for (i = 0; i < this._realNumItems; i++) {
                         var ii = this._virtualItems[i];
-                        if ((ii.obj instanceof fgui.GButton) && ii.obj.selected
-                            || ii.obj == null && ii.selected) {
+                        if ((ii.obj instanceof fgui.GButton) && ii.obj.selected ||
+                            ii.obj == null && ii.selected) {
                             if (this._loop)
                                 return i % this._numItems;
                             else
                                 return i;
                         }
                     }
-                }
-                else {
+                } else {
                     var cnt = this._children.length;
                     for (i = 0; i < cnt; i++) {
                         var obj = this._children[i].asButton;
@@ -4860,8 +4838,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (this._selectionMode != fgui.ListSelectionMode.Single)
                         this.clearSelection();
                     this.addSelection(value);
-                }
-                else
+                } else
                     this.clearSelection();
             },
             enumerable: true,
@@ -4873,8 +4850,8 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._virtual) {
                 for (i = 0; i < this._realNumItems; i++) {
                     var ii = this._virtualItems[i];
-                    if ((ii.obj instanceof fgui.GButton) && ii.obj.selected
-                        || ii.obj == null && ii.selected) {
+                    if ((ii.obj instanceof fgui.GButton) && ii.obj.selected ||
+                        ii.obj == null && ii.selected) {
                         var j = i;
                         if (this._loop) {
                             j = i % this._numItems;
@@ -4884,8 +4861,7 @@ window.__extends = (this && this.__extends) || (function () {
                         ret.push(j);
                     }
                 }
-            }
-            else {
+            } else {
                 var cnt = this._children.length;
                 for (i = 0; i < cnt; i++) {
                     var obj = this._children[i].asButton;
@@ -4910,8 +4886,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (ii.obj != null)
                     obj = ii.obj.asButton;
                 ii.selected = true;
-            }
-            else
+            } else
                 obj = this.getChildAt(index).asButton;
             if (obj != null && !obj.selected) {
                 obj.selected = true;
@@ -4927,8 +4902,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (ii.obj != null)
                     obj = ii.obj.asButton;
                 ii.selected = false;
-            }
-            else
+            } else
                 obj = this.getChildAt(index).asButton;
             if (obj != null)
                 obj.selected = false;
@@ -4942,8 +4916,7 @@ window.__extends = (this && this.__extends) || (function () {
                         ii.obj.selected = false;
                     ii.selected = false;
                 }
-            }
-            else {
+            } else {
                 var cnt = this._children.length;
                 for (i = 0; i < cnt; i++) {
                     var obj = this._children[i].asButton;
@@ -4963,8 +4936,7 @@ window.__extends = (this && this.__extends) || (function () {
                         ii.selected = false;
                     }
                 }
-            }
-            else {
+            } else {
                 var cnt = this._children.length;
                 for (i = 0; i < cnt; i++) {
                     var obj = this._children[i].asButton;
@@ -4986,8 +4958,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     ii.selected = true;
                 }
-            }
-            else {
+            } else {
                 var cnt = this._children.length;
                 for (i = 0; i < cnt; i++) {
                     var obj = this._children[i].asButton;
@@ -5017,8 +4988,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     ii.selected = !ii.selected;
                 }
-            }
-            else {
+            } else {
                 var cnt = this._children.length;
                 for (i = 0; i < cnt; i++) {
                     var obj = this._children[i].asButton;
@@ -5037,15 +5007,14 @@ window.__extends = (this && this.__extends) || (function () {
             if (index == -1)
                 return;
             switch (dir) {
-                case 1://up
+                case 1: //up
                     if (this._layout == fgui.ListLayoutType.SingleColumn || this._layout == fgui.ListLayoutType.FlowVertical) {
                         index--;
                         if (index >= 0) {
                             this.clearSelection();
                             this.addSelection(index, true);
                         }
-                    }
-                    else if (this._layout == fgui.ListLayoutType.FlowHorizontal || this._layout == fgui.ListLayoutType.Pagination) {
+                    } else if (this._layout == fgui.ListLayoutType.FlowHorizontal || this._layout == fgui.ListLayoutType.Pagination) {
                         var current = this._children[index];
                         var k = 0;
                         for (var i = index - 1; i >= 0; i--) {
@@ -5066,15 +5035,14 @@ window.__extends = (this && this.__extends) || (function () {
                         }
                     }
                     break;
-                case 3://right
+                case 3: //right
                     if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowHorizontal || this._layout == fgui.ListLayoutType.Pagination) {
                         index++;
                         if (index < this._children.length) {
                             this.clearSelection();
                             this.addSelection(index, true);
                         }
-                    }
-                    else if (this._layout == fgui.ListLayoutType.FlowVertical) {
+                    } else if (this._layout == fgui.ListLayoutType.FlowVertical) {
                         current = this._children[index];
                         k = 0;
                         var cnt = this._children.length;
@@ -5096,15 +5064,14 @@ window.__extends = (this && this.__extends) || (function () {
                         }
                     }
                     break;
-                case 5://down
+                case 5: //down
                     if (this._layout == fgui.ListLayoutType.SingleColumn || this._layout == fgui.ListLayoutType.FlowVertical) {
                         index++;
                         if (index < this._children.length) {
                             this.clearSelection();
                             this.addSelection(index, true);
                         }
-                    }
-                    else if (this._layout == fgui.ListLayoutType.FlowHorizontal || this._layout == fgui.ListLayoutType.Pagination) {
+                    } else if (this._layout == fgui.ListLayoutType.FlowHorizontal || this._layout == fgui.ListLayoutType.Pagination) {
                         current = this._children[index];
                         k = 0;
                         cnt = this._children.length;
@@ -5126,15 +5093,14 @@ window.__extends = (this && this.__extends) || (function () {
                         }
                     }
                     break;
-                case 7://left
+                case 7: //left
                     if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowHorizontal || this._layout == fgui.ListLayoutType.Pagination) {
                         index--;
                         if (index >= 0) {
                             this.clearSelection();
                             this.addSelection(index, true);
                         }
-                    }
-                    else if (this._layout == fgui.ListLayoutType.FlowVertical) {
+                    } else if (this._layout == fgui.ListLayoutType.FlowVertical) {
                         current = this._children[index];
                         k = 0;
                         for (i = index - 1; i >= 0; i--) {
@@ -5177,8 +5143,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.clearSelectionExcept(button);
                     button.selected = true;
                 }
-            }
-            else {
+            } else {
                 if (evt.isShiftDown) {
                     if (!button.selected) {
                         if (this._lastSelectedIndex != -1) {
@@ -5193,8 +5158,7 @@ window.__extends = (this && this.__extends) || (function () {
                                         ii.obj.selected = true;
                                     ii.selected = true;
                                 }
-                            }
-                            else {
+                            } else {
                                 for (i = min; i <= max; i++) {
                                     var obj = this.getChildAt(i).asButton;
                                     if (obj != null)
@@ -5202,21 +5166,17 @@ window.__extends = (this && this.__extends) || (function () {
                                 }
                             }
                             dontChangeLastIndex = true;
-                        }
-                        else {
+                        } else {
                             button.selected = true;
                         }
                     }
-                }
-                else if (evt.isCtrlDown || this._selectionMode == fgui.ListSelectionMode.Multiple_SingleClick) {
+                } else if (evt.isCtrlDown || this._selectionMode == fgui.ListSelectionMode.Multiple_SingleClick) {
                     button.selected = !button.selected;
-                }
-                else {
+                } else {
                     if (!button.selected) {
                         this.clearSelectionExcept(button);
                         button.selected = true;
-                    }
-                    else
+                    } else
                         this.clearSelectionExcept(button);
                 }
             }
@@ -5226,8 +5186,12 @@ window.__extends = (this && this.__extends) || (function () {
                 this.updateSelectionController(index);
         };
         GList.prototype.resizeToFit = function (itemCount, minSize) {
-            if (itemCount === void 0) { itemCount = Number.POSITIVE_INFINITY; }
-            if (minSize === void 0) { minSize = 0; }
+            if (itemCount === void 0) {
+                itemCount = Number.POSITIVE_INFINITY;
+            }
+            if (minSize === void 0) {
+                minSize = 0;
+            }
             this.ensureBoundsCorrect();
             var curCount = this.numItems;
             if (itemCount > curCount)
@@ -5238,14 +5202,12 @@ window.__extends = (this && this.__extends) || (function () {
                     this.viewHeight = lineCount * this._itemSize.height + Math.max(0, lineCount - 1) * this._lineGap;
                 else
                     this.viewWidth = lineCount * this._itemSize.width + Math.max(0, lineCount - 1) * this._columnGap;
-            }
-            else if (itemCount == 0) {
+            } else if (itemCount == 0) {
                 if (this._layout == fgui.ListLayoutType.SingleColumn || this._layout == fgui.ListLayoutType.FlowHorizontal)
                     this.viewHeight = minSize;
                 else
                     this.viewWidth = minSize;
-            }
-            else {
+            } else {
                 var i = itemCount - 1;
                 var obj = null;
                 while (i >= 0) {
@@ -5259,16 +5221,14 @@ window.__extends = (this && this.__extends) || (function () {
                         this.viewHeight = minSize;
                     else
                         this.viewWidth = minSize;
-                }
-                else {
+                } else {
                     var size = 0;
                     if (this._layout == fgui.ListLayoutType.SingleColumn || this._layout == fgui.ListLayoutType.FlowHorizontal) {
                         size = obj.y + obj.height;
                         if (size < minSize)
                             size = minSize;
                         this.viewHeight = size;
-                    }
-                    else {
+                    } else {
                         size = obj.x + obj.width;
                         if (size < minSize)
                             size = minSize;
@@ -5299,8 +5259,8 @@ window.__extends = (this && this.__extends) || (function () {
                 this.selectedIndex = c.selectedIndex;
         };
         GList.prototype.updateSelectionController = function (index) {
-            if (this._selectionController != null && !this._selectionController.changing
-                && index < this._selectionController.pageCount) {
+            if (this._selectionController != null && !this._selectionController.changing &&
+                index < this._selectionController.pageCount) {
                 var c = this._selectionController;
                 this._selectionController = null;
                 c.selectedIndex = index;
@@ -5319,16 +5279,14 @@ window.__extends = (this && this.__extends) || (function () {
                     yValue = GList.pos_param;
                     if (index < this._virtualItems.length && saved - yValue > this._virtualItems[index].height / 2 && index < this._realNumItems)
                         yValue += this._virtualItems[index].height + this._lineGap;
-                }
-                else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
+                } else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
                     saved = xValue;
                     GList.pos_param = xValue;
                     index = this.getIndexOnPos2(false);
                     xValue = GList.pos_param;
                     if (index < this._virtualItems.length && saved - xValue > this._virtualItems[index].width / 2 && index < this._realNumItems)
                         xValue += this._virtualItems[index].width + this._columnGap;
-                }
-                else {
+                } else {
                     saved = xValue;
                     GList.pos_param = xValue;
                     index = this.getIndexOnPos3(false);
@@ -5339,8 +5297,7 @@ window.__extends = (this && this.__extends) || (function () {
                 resultPoint.x = xValue;
                 resultPoint.y = yValue;
                 return resultPoint;
-            }
-            else {
+            } else {
                 return _super.prototype.getSnappingPosition.call(this, xValue, yValue, resultPoint);
             }
         };
@@ -5361,21 +5318,18 @@ window.__extends = (this && this.__extends) || (function () {
                     for (i = this._curLineItemCount - 1; i < index; i += this._curLineItemCount)
                         pos += this._virtualItems[i].height + this._lineGap;
                     rect = new cc.Rect(0, pos, this._itemSize.width, ii.height);
-                }
-                else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
+                } else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
                     for (i = this._curLineItemCount - 1; i < index; i += this._curLineItemCount)
                         pos += this._virtualItems[i].width + this._columnGap;
                     rect = new cc.Rect(pos, 0, ii.width, this._itemSize.height);
-                }
-                else {
+                } else {
                     var page = index / (this._curLineItemCount * this._curLineItemCount2);
                     rect = new cc.Rect(page * this.viewWidth + (index % this._curLineItemCount) * (ii.width + this._columnGap), (index / this._curLineItemCount) % this._curLineItemCount2 * (ii.height + this._lineGap), ii.width, ii.height);
                 }
                 setFirst = true; //因为在可变item大小的情况下，只有设置在最顶端，位置才不会因为高度变化而改变，所以只能支持setFirst=true
                 if (this._scrollPane != null)
                     this._scrollPane.scrollToView(rect, ani, setFirst);
-            }
-            else {
+            } else {
                 var obj = this.getChildAt(index);
                 if (obj != null) {
                     if (this._scrollPane != null)
@@ -5400,8 +5354,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                 }
                 return index;
-            }
-            else {
+            } else {
                 index += this._firstIndex;
                 if (this._loop && this._numItems > 0)
                     index = index % this._numItems;
@@ -5413,16 +5366,14 @@ window.__extends = (this && this.__extends) || (function () {
                 return index;
             if (this._layout == fgui.ListLayoutType.Pagination) {
                 return this.getChildIndex(this._virtualItems[index].obj);
-            }
-            else {
+            } else {
                 if (this._loop && this._numItems > 0) {
                     var j = this._firstIndex % this._numItems;
                     if (index >= j)
                         index = index - j;
                     else
                         index = this._numItems - j + index;
-                }
-                else
+                } else
                     index -= this._firstIndex;
                 return index;
             }
@@ -5457,8 +5408,7 @@ window.__extends = (this && this.__extends) || (function () {
                     var obj = this.getFromPool(null);
                     if (obj == null) {
                         throw "Virtual List must have a default list item resource.";
-                    }
-                    else {
+                    } else {
                         this._itemSize.width = obj.width;
                         this._itemSize.height = obj.height;
                     }
@@ -5468,8 +5418,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._scrollPane.scrollStep = this._itemSize.height;
                     if (this._loop)
                         this._scrollPane._loop = 2;
-                }
-                else {
+                } else {
                     this._scrollPane.scrollStep = this._itemSize.width;
                     if (this._loop)
                         this._scrollPane._loop = 1;
@@ -5480,8 +5429,8 @@ window.__extends = (this && this.__extends) || (function () {
         };
         Object.defineProperty(GList.prototype, "numItems", {
             /// <summary>
-            /// Set the list item count. 
-            /// If the list is not virtual, specified number of items will be created. 
+            /// Set the list item count.
+            /// If the list is not virtual, specified number of items will be created.
             /// If the list is virtual, only items in view will be created.
             /// </summary>
             get: function () {
@@ -5508,8 +5457,7 @@ window.__extends = (this && this.__extends) || (function () {
                             ii.height = this._itemSize.height;
                             this._virtualItems.push(ii);
                         }
-                    }
-                    else {
+                    } else {
                         for (i = this._realNumItems; i < oldCount; i++)
                             this._virtualItems[i].selected = false;
                     }
@@ -5517,8 +5465,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this._partner.callLater(this._refreshVirtualList);
                     //立即刷新
                     this._refreshVirtualList();
-                }
-                else {
+                } else {
                     var cnt = this._children.length;
                     if (value > cnt) {
                         for (var i = cnt; i < value; i++) {
@@ -5527,8 +5474,7 @@ window.__extends = (this && this.__extends) || (function () {
                             else
                                 this.addItemFromPool(this.itemProvider(i));
                         }
-                    }
-                    else {
+                    } else {
                         this.removeChildrenToPool(value, cnt);
                     }
                     if (this.itemRenderer != null) {
@@ -5576,8 +5522,7 @@ window.__extends = (this && this.__extends) || (function () {
                         if (this._curLineItemCount <= 0)
                             this._curLineItemCount = 1;
                     }
-                }
-                else if (this._layout == fgui.ListLayoutType.FlowVertical) {
+                } else if (this._layout == fgui.ListLayoutType.FlowVertical) {
                     if (this._lineCount > 0)
                         this._curLineItemCount = this._lineCount;
                     else {
@@ -5585,8 +5530,8 @@ window.__extends = (this && this.__extends) || (function () {
                         if (this._curLineItemCount <= 0)
                             this._curLineItemCount = 1;
                     }
-                }
-                else {
+                } else //pagination
+                {
                     if (this._columnCount > 0)
                         this._curLineItemCount = this._columnCount;
                     else {
@@ -5603,7 +5548,8 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                 }
             }
-            var ch = 0, cw = 0;
+            var ch = 0,
+                cw = 0;
             if (this._realNumItems > 0) {
                 var i;
                 var len = Math.ceil(this._realNumItems / this._curLineItemCount) * this._curLineItemCount;
@@ -5621,8 +5567,7 @@ window.__extends = (this && this.__extends) || (function () {
                         if (cw > 0)
                             cw -= this._columnGap;
                     }
-                }
-                else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
+                } else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
                     for (i = 0; i < len; i += this._curLineItemCount)
                         cw += this._virtualItems[i].width + this._columnGap;
                     if (cw > 0)
@@ -5635,8 +5580,7 @@ window.__extends = (this && this.__extends) || (function () {
                         if (ch > 0)
                             ch -= this._lineGap;
                     }
-                }
-                else {
+                } else {
                     var pageCount = Math.ceil(len / (this._curLineItemCount * this._curLineItemCount2));
                     cw = pageCount * this.viewWidth;
                     ch = this.viewHeight;
@@ -5670,8 +5614,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     GList.pos_param = 0;
                     return 0;
-                }
-                else {
+                } else {
                     for (i = this._firstIndex; i < this._realNumItems; i += this._curLineItemCount) {
                         pos3 = pos2 + this._virtualItems[i].height + this._lineGap;
                         if (pos3 > GList.pos_param) {
@@ -5683,8 +5626,7 @@ window.__extends = (this && this.__extends) || (function () {
                     GList.pos_param = pos2;
                     return this._realNumItems - this._curLineItemCount;
                 }
-            }
-            else {
+            } else {
                 pos2 = 0;
                 for (i = 0; i < this._realNumItems; i += this._curLineItemCount) {
                     pos3 = pos2 + this._virtualItems[i].height + this._lineGap;
@@ -5718,8 +5660,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     GList.pos_param = 0;
                     return 0;
-                }
-                else {
+                } else {
                     for (i = this._firstIndex; i < this._realNumItems; i += this._curLineItemCount) {
                         pos3 = pos2 + this._virtualItems[i].width + this._columnGap;
                         if (pos3 > GList.pos_param) {
@@ -5731,8 +5672,7 @@ window.__extends = (this && this.__extends) || (function () {
                     GList.pos_param = pos2;
                     return this._realNumItems - this._curLineItemCount;
                 }
-            }
-            else {
+            } else {
                 pos2 = 0;
                 for (i = 0; i < this._realNumItems; i += this._curLineItemCount) {
                     pos3 = pos2 + this._virtualItems[i].width + this._columnGap;
@@ -5782,8 +5722,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                 }
                 this.handleArchOrder1();
-            }
-            else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
+            } else if (this._layout == fgui.ListLayoutType.SingleRow || this._layout == fgui.ListLayoutType.FlowVertical) {
                 enterCounter = 0;
                 while (this.handleScroll2(forceUpdate)) {
                     enterCounter++;
@@ -5794,8 +5733,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                 }
                 this.handleArchOrder2();
-            }
-            else {
+            } else {
                 this.handleScroll3(forceUpdate);
             }
             this._boundsChanged = false;
@@ -5818,7 +5756,8 @@ window.__extends = (this && this.__extends) || (function () {
             var childCount = this.numChildren;
             var lastIndex = oldFirstIndex + childCount - 1;
             var reuseIndex = forward ? lastIndex : oldFirstIndex;
-            var curX = 0, curY = pos;
+            var curX = 0,
+                curY = pos;
             var needRender;
             var deltaSize = 0;
             var firstItemDeltaSize = 0;
@@ -5858,8 +5797,7 @@ window.__extends = (this && this.__extends) || (function () {
                                 break;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         for (j = reuseIndex; j <= lastIndex; j++) {
                             ii2 = this._virtualItems[j];
                             if (ii2.obj != null && ii2.updateFlag != this.itemInfoVer && ii2.obj.resourceURL == url) {
@@ -5875,8 +5813,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     if (ii.obj != null) {
                         this.setChildIndex(ii.obj, forward ? curIndex - newFirstIndex : this.numChildren);
-                    }
-                    else {
+                    } else {
                         ii.obj = this._pool.getObject(url);
                         if (forward)
                             this.addChildAt(ii.obj, curIndex - newFirstIndex);
@@ -5886,8 +5823,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (ii.obj instanceof fgui.GButton)
                         ii.obj.selected = ii.selected;
                     needRender = true;
-                }
-                else
+                } else
                     needRender = forceUpdate;
                 if (needRender) {
                     if (this._autoResizeItem && (this._layout == fgui.ListLayoutType.SingleColumn || this._columnCount > 0))
@@ -5905,7 +5841,7 @@ window.__extends = (this && this.__extends) || (function () {
                 }
                 ii.updateFlag = this.itemInfoVer;
                 ii.obj.setPosition(curX, curY);
-                if (curIndex == newFirstIndex)
+                if (curIndex == newFirstIndex) //要显示多一条才不会穿帮
                     max += ii.height;
                 curX += ii.width + this._columnGap;
                 if (curIndex % this._curLineItemCount == this._curLineItemCount - 1) {
@@ -5931,7 +5867,7 @@ window.__extends = (this && this.__extends) || (function () {
             }
             if (deltaSize != 0 || firstItemDeltaSize != 0)
                 this._scrollPane.changeContentSizeOnScrolling(0, deltaSize, 0, firstItemDeltaSize);
-            if (curIndex > 0 && this.numChildren > 0 && this._container.y < 0 && this.getChildAt(0).y > -this._container.y)
+            if (curIndex > 0 && this.numChildren > 0 && this._container.y < 0 && this.getChildAt(0).y > -this._container.y) //最后一页没填满！
                 return true;
             else
                 return false;
@@ -5954,7 +5890,8 @@ window.__extends = (this && this.__extends) || (function () {
             var childCount = this.numChildren;
             var lastIndex = oldFirstIndex + childCount - 1;
             var reuseIndex = forward ? lastIndex : oldFirstIndex;
-            var curX = pos, curY = 0;
+            var curX = pos,
+                curY = 0;
             var needRender;
             var deltaSize = 0;
             var firstItemDeltaSize = 0;
@@ -5993,8 +5930,7 @@ window.__extends = (this && this.__extends) || (function () {
                                 break;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         for (j = reuseIndex; j <= lastIndex; j++) {
                             ii2 = this._virtualItems[j];
                             if (ii2.obj != null && ii2.updateFlag != this.itemInfoVer && ii2.obj.resourceURL == url) {
@@ -6010,8 +5946,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     if (ii.obj != null) {
                         this.setChildIndex(ii.obj, forward ? curIndex - newFirstIndex : this.numChildren);
-                    }
-                    else {
+                    } else {
                         ii.obj = this._pool.getObject(url);
                         if (forward)
                             this.addChildAt(ii.obj, curIndex - newFirstIndex);
@@ -6021,8 +5956,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (ii.obj instanceof fgui.GButton)
                         ii.obj.selected = ii.selected;
                     needRender = true;
-                }
-                else
+                } else
                     needRender = forceUpdate;
                 if (needRender) {
                     if (this._autoResizeItem && (this._layout == fgui.ListLayoutType.SingleRow || this._lineCount > 0))
@@ -6040,7 +5974,7 @@ window.__extends = (this && this.__extends) || (function () {
                 }
                 ii.updateFlag = this.itemInfoVer;
                 ii.obj.setPosition(curX, curY);
-                if (curIndex == newFirstIndex)
+                if (curIndex == newFirstIndex) //要显示多一条才不会穿帮
                     max += ii.width;
                 curY += ii.height + this._lineGap;
                 if (curIndex % this._curLineItemCount == this._curLineItemCount - 1) {
@@ -6066,7 +6000,7 @@ window.__extends = (this && this.__extends) || (function () {
             }
             if (deltaSize != 0 || firstItemDeltaSize != 0)
                 this._scrollPane.changeContentSizeOnScrolling(deltaSize, 0, firstItemDeltaSize, 0);
-            if (curIndex > 0 && this.numChildren > 0 && this._container.x < 0 && this.getChildAt(0).x > -this._container.x)
+            if (curIndex > 0 && this.numChildren > 0 && this._container.x < 0 && this.getChildAt(0).x > -this._container.x) //最后一页没填满！
                 return true;
             else
                 return false;
@@ -6106,8 +6040,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (i - startIndex < pageSize) {
                     if (col < startCol)
                         continue;
-                }
-                else {
+                } else {
                     if (col > startCol)
                         continue;
                 }
@@ -6146,16 +6079,14 @@ window.__extends = (this && this.__extends) || (function () {
                         }
                         ii.obj = this._pool.getObject(url);
                         this.addChildAt(ii.obj, insertIndex);
-                    }
-                    else {
+                    } else {
                         insertIndex = this.setChildIndexBefore(ii.obj, insertIndex);
                     }
                     insertIndex++;
                     if (ii.obj instanceof fgui.GButton)
                         ii.obj.selected = ii.selected;
                     needRender = true;
-                }
-                else {
+                } else {
                     needRender = forceUpdate;
                     insertIndex = -1;
                     lastObj = ii.obj;
@@ -6196,8 +6127,7 @@ window.__extends = (this && this.__extends) || (function () {
                         xx = borderX;
                         yy = 0;
                     }
-                }
-                else
+                } else
                     xx += ii.width + this._columnGap;
             }
             //释放未使用的
@@ -6286,7 +6216,8 @@ window.__extends = (this && this.__extends) || (function () {
             var curY = 0;
             var maxWidth = 0;
             var maxHeight = 0;
-            var cw = 0, ch = 0;
+            var cw = 0,
+                ch = 0;
             var j = 0;
             var page = 0;
             var k = 0;
@@ -6312,8 +6243,7 @@ window.__extends = (this && this.__extends) || (function () {
                 }
                 cw = Math.ceil(maxWidth);
                 ch = curY;
-            }
-            else if (this._layout == fgui.ListLayoutType.SingleRow) {
+            } else if (this._layout == fgui.ListLayoutType.SingleRow) {
                 for (i = 0; i < cnt; i++) {
                     child = this.getChildAt(i);
                     if (this.foldInvisibleItems && !child.visible)
@@ -6329,8 +6259,7 @@ window.__extends = (this && this.__extends) || (function () {
                 }
                 cw = curX;
                 ch = Math.ceil(maxHeight);
-            }
-            else if (this._layout == fgui.ListLayoutType.FlowHorizontal) {
+            } else if (this._layout == fgui.ListLayoutType.FlowHorizontal) {
                 if (this._autoResizeItem && this._columnCount > 0) {
                     for (i = 0; i < cnt; i++) {
                         child = this.getChildAt(i);
@@ -6349,8 +6278,7 @@ window.__extends = (this && this.__extends) || (function () {
                                 if (j < i) {
                                     child.setSize(child.sourceWidth + Math.round(child.sourceWidth * ratio), child.height, true);
                                     curX += Math.ceil(child.width) + this._columnGap;
-                                }
-                                else {
+                                } else {
                                     child.setSize(viewWidth - curX, child.height, true);
                                 }
                                 if (child.height > maxHeight)
@@ -6366,16 +6294,15 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     ch = curY + Math.ceil(maxHeight);
                     cw = viewWidth;
-                }
-                else {
+                } else {
                     for (i = 0; i < cnt; i++) {
                         child = this.getChildAt(i);
                         if (this.foldInvisibleItems && !child.visible)
                             continue;
                         if (curX != 0)
                             curX += this._columnGap;
-                        if (this._columnCount != 0 && j >= this._columnCount
-                            || this._columnCount == 0 && curX + child.width > viewWidth && maxHeight != 0) {
+                        if (this._columnCount != 0 && j >= this._columnCount ||
+                            this._columnCount == 0 && curX + child.width > viewWidth && maxHeight != 0) {
                             //new line
                             curX = 0;
                             curY += Math.ceil(maxHeight) + this._lineGap;
@@ -6393,8 +6320,7 @@ window.__extends = (this && this.__extends) || (function () {
                     ch = curY + Math.ceil(maxHeight);
                     cw = Math.ceil(maxWidth);
                 }
-            }
-            else if (this._layout == fgui.ListLayoutType.FlowVertical) {
+            } else if (this._layout == fgui.ListLayoutType.FlowVertical) {
                 if (this._autoResizeItem && this._lineCount > 0) {
                     for (i = 0; i < cnt; i++) {
                         child = this.getChildAt(i);
@@ -6413,8 +6339,7 @@ window.__extends = (this && this.__extends) || (function () {
                                 if (j < i) {
                                     child.setSize(child.width, child.sourceHeight + Math.round(child.sourceHeight * ratio), true);
                                     curY += Math.ceil(child.height) + this._lineGap;
-                                }
-                                else {
+                                } else {
                                     child.setSize(child.width, viewHeight - curY, true);
                                 }
                                 if (child.width > maxWidth)
@@ -6430,16 +6355,15 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     cw = curX + Math.ceil(maxWidth);
                     ch = viewHeight;
-                }
-                else {
+                } else {
                     for (i = 0; i < cnt; i++) {
                         child = this.getChildAt(i);
                         if (this.foldInvisibleItems && !child.visible)
                             continue;
                         if (curY != 0)
                             curY += this._lineGap;
-                        if (this._lineCount != 0 && j >= this._lineCount
-                            || this._lineCount == 0 && curY + child.height > viewHeight && maxWidth != 0) {
+                        if (this._lineCount != 0 && j >= this._lineCount ||
+                            this._lineCount == 0 && curY + child.height > viewHeight && maxWidth != 0) {
                             curY = 0;
                             curX += Math.ceil(maxWidth) + this._columnGap;
                             maxWidth = 0;
@@ -6456,8 +6380,8 @@ window.__extends = (this && this.__extends) || (function () {
                     cw = curX + Math.ceil(maxWidth);
                     ch = Math.ceil(maxHeight);
                 }
-            }
-            else {
+            } else //pagination
+            {
                 var eachHeight;
                 if (this._autoResizeItem && this._lineCount > 0)
                     eachHeight = Math.floor((viewHeight - (this._lineCount - 1) * this._lineGap) / this._lineCount);
@@ -6466,8 +6390,8 @@ window.__extends = (this && this.__extends) || (function () {
                         child = this.getChildAt(i);
                         if (this.foldInvisibleItems && !child.visible)
                             continue;
-                        if (j == 0 && (this._lineCount != 0 && k >= this._lineCount
-                            || this._lineCount == 0 && curY + (this._lineCount > 0 ? eachHeight : child.height) > viewHeight)) {
+                        if (j == 0 && (this._lineCount != 0 && k >= this._lineCount ||
+                                this._lineCount == 0 && curY + (this._lineCount > 0 ? eachHeight : child.height) > viewHeight)) {
                             //new page
                             page++;
                             curY = 0;
@@ -6486,8 +6410,7 @@ window.__extends = (this && this.__extends) || (function () {
                                 if (j < i) {
                                     child.setSize(child.sourceWidth + Math.round(child.sourceWidth * ratio), this._lineCount > 0 ? eachHeight : child.height, true);
                                     curX += Math.ceil(child.width) + this._columnGap;
-                                }
-                                else {
+                                } else {
                                     child.setSize(viewWidth - curX, this._lineCount > 0 ? eachHeight : child.height, true);
                                 }
                                 if (child.height > maxHeight)
@@ -6502,8 +6425,7 @@ window.__extends = (this && this.__extends) || (function () {
                             k++;
                         }
                     }
-                }
-                else {
+                } else {
                     for (i = 0; i < cnt; i++) {
                         child = this.getChildAt(i);
                         if (this.foldInvisibleItems && !child.visible)
@@ -6512,16 +6434,17 @@ window.__extends = (this && this.__extends) || (function () {
                             curX += this._columnGap;
                         if (this._autoResizeItem && this._lineCount > 0)
                             child.setSize(child.width, eachHeight, true);
-                        if (this._columnCount != 0 && j >= this._columnCount
-                            || this._columnCount == 0 && curX + child.width > viewWidth && maxHeight != 0) {
+                        if (this._columnCount != 0 && j >= this._columnCount ||
+                            this._columnCount == 0 && curX + child.width > viewWidth && maxHeight != 0) {
                             //new line
                             curX = 0;
                             curY += Math.ceil(maxHeight) + this._lineGap;
                             maxHeight = 0;
                             j = 0;
                             k++;
-                            if (this._lineCount != 0 && k >= this._lineCount
-                                || this._lineCount == 0 && curY + child.height > viewHeight && maxWidth != 0) {
+                            if (this._lineCount != 0 && k >= this._lineCount ||
+                                this._lineCount == 0 && curY + child.height > viewHeight && maxWidth != 0) //new page
+                            {
                                 page++;
                                 curY = 0;
                                 k = 0;
@@ -6575,8 +6498,7 @@ window.__extends = (this && this.__extends) || (function () {
                 buffer.seek(beginPos, 7);
                 this.setupScroll(buffer);
                 buffer.position = savedPos;
-            }
-            else
+            } else
                 this.setupOverflow(overflow);
             if (buffer.readBool())
                 buffer.skip(8);
@@ -6702,6 +6624,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GLoader = /** @class */ (function (_super) {
         __extends(GLoader, _super);
+
         function GLoader() {
             var _this = _super.call(this) || this;
             _this._frame = 0;
@@ -6950,8 +6873,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (value != null) {
                     this._contentSourceWidth = value.getRect().width;
                     this._contentSourceHeight = value.getRect().height;
-                }
-                else {
+                } else {
                     this._contentSourceWidth = this._contentHeight = 0;
                 }
                 this.updateLayout();
@@ -6977,8 +6899,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._contentItem.type == fgui.PackageItemType.Image) {
                     if (!this._contentItem.asset) {
                         this.setErrorState();
-                    }
-                    else {
+                    } else {
                         this._content.spriteFrame = this._contentItem.asset;
                         if (this._contentItem.scale9Grid)
                             this._content.type = cc.Sprite.Type.SLICED;
@@ -6990,8 +6911,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this._contentSourceHeight = this._contentItem.height;
                         this.updateLayout();
                     }
-                }
-                else if (this._contentItem.type == fgui.PackageItemType.MovieClip) {
+                } else if (this._contentItem.type == fgui.PackageItemType.MovieClip) {
                     this._contentSourceWidth = this._contentItem.width;
                     this._contentSourceHeight = this._contentItem.height;
                     this._content.interval = this._contentItem.interval;
@@ -6999,27 +6919,23 @@ window.__extends = (this && this.__extends) || (function () {
                     this._content.repeatDelay = this._contentItem.repeatDelay;
                     this._content.frames = this._contentItem.frames;
                     this.updateLayout();
-                }
-                else if (this._contentItem.type == fgui.PackageItemType.Component) {
+                } else if (this._contentItem.type == fgui.PackageItemType.Component) {
                     var obj = fgui.UIPackage.createObjectFromURL(itemURL);
                     if (!obj)
                         this.setErrorState();
                     else if (!(obj instanceof fgui.GComponent)) {
                         obj.dispose();
                         this.setErrorState();
-                    }
-                    else {
+                    } else {
                         this._content2 = obj.asCom;
                         this._container.addChild(this._content2.node);
                         this._contentSourceWidth = this._contentItem.width;
                         this._contentSourceHeight = this._contentItem.height;
                         this.updateLayout();
                     }
-                }
-                else
+                } else
                     this.setErrorState();
-            }
-            else
+            } else
                 this.setErrorState();
         };
         GLoader.prototype.loadExternal = function () {
@@ -7040,8 +6956,7 @@ window.__extends = (this && this.__extends) || (function () {
             else if (asset instanceof cc.Texture2D)
                 this.onExternalLoadSuccess(new cc.SpriteFrame(asset));
         };
-        GLoader.prototype.freeExternal = function (texture) {
-        };
+        GLoader.prototype.freeExternal = function (texture) {};
         GLoader.prototype.onExternalLoadSuccess = function (texture) {
             this._content.spriteFrame = texture;
             this._content.type = cc.Sprite.Type.SIMPLE;
@@ -7100,7 +7015,8 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._contentWidth == this._width && this._contentHeight == this._height)
                     return;
             }
-            var sx = 1, sy = 1;
+            var sx = 1,
+                sy = 1;
             if (this._fill != fgui.LoaderFillType.None) {
                 sx = this.width / this._contentSourceWidth;
                 sy = this.height / this._contentSourceHeight;
@@ -7114,8 +7030,7 @@ window.__extends = (this && this.__extends) || (function () {
                             sx = sy;
                         else
                             sy = sx;
-                    }
-                    else if (this._fill == fgui.LoaderFillType.ScaleNoBorder) {
+                    } else if (this._fill == fgui.LoaderFillType.ScaleNoBorder) {
                         if (sx > sy)
                             sy = sx;
                         else
@@ -7221,6 +7136,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GMovieClip = /** @class */ (function (_super) {
         __extends(GMovieClip, _super);
+
         function GMovieClip() {
             var _this = _super.call(this) || this;
             _this._node.name = "GMovieClip";
@@ -7323,6 +7239,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GProgressBar = /** @class */ (function (_super) {
         __extends(GProgressBar, _super);
+
         function GProgressBar() {
             var _this = _super.call(this) || this;
             _this._max = 0;
@@ -7393,9 +7310,10 @@ window.__extends = (this && this.__extends) || (function () {
                 this._value = value;
                 this._tweening = true;
                 return fgui.GTween.to(oldValule, this._value, duration).setTarget(this, this.update).setEase(fgui.EaseType.Linear)
-                    .onComplete(function () { this._tweening = false; }, this);
-            }
-            else
+                    .onComplete(function () {
+                        this._tweening = false;
+                    }, this);
+            } else
                 return null;
         };
         GProgressBar.prototype.update = function (newValue) {
@@ -7431,8 +7349,7 @@ window.__extends = (this && this.__extends) || (function () {
                     else
                         this._barObjectV.height = Math.round(fullHeight * percent);
                 }
-            }
-            else {
+            } else {
                 if (this._barObjectH) {
                     if ((this._barObjectH instanceof fgui.GImage) && this._barObjectH.fillMethod != fgui.FillMethod.None)
                         this._barObjectH.fillAmount = 1 - percent;
@@ -7508,6 +7425,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GTextField = /** @class */ (function (_super) {
         __extends(GTextField, _super);
+
         function GTextField() {
             var _this = _super.call(this) || this;
             _this._fontSize = 0;
@@ -7647,8 +7565,7 @@ window.__extends = (this && this.__extends) || (function () {
             get: function () {
                 return false;
             },
-            set: function (value) {
-            },
+            set: function (value) {},
             enumerable: true,
             configurable: true
         });
@@ -7656,8 +7573,7 @@ window.__extends = (this && this.__extends) || (function () {
             get: function () {
                 return false;
             },
-            set: function (value) {
-            },
+            set: function (value) {},
             enumerable: true,
             configurable: true
         });
@@ -7665,8 +7581,7 @@ window.__extends = (this && this.__extends) || (function () {
             get: function () {
                 return false;
             },
-            set: function (value) {
-            },
+            set: function (value) {},
             enumerable: true,
             configurable: true
         });
@@ -7688,8 +7603,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (value == 0) {
                     if (this._outline)
                         this._outline.enabled = false;
-                }
-                else {
+                } else {
                     if (!this._outline)
                         this._outline = this._node.addComponent(cc.LabelOutline);
                     else
@@ -7744,12 +7658,14 @@ window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         GTextField.prototype.parseTemplate = function (template) {
-            var pos1 = 0, pos2, pos3;
+            var pos1 = 0,
+                pos2, pos3;
             var tag;
             var value;
             var result = "";
             while ((pos2 = template.indexOf("{", pos1)) != -1) {
-                if (pos2 > 0 && template.charCodeAt(pos2 - 1) == 92) {
+                if (pos2 > 0 && template.charCodeAt(pos2 - 1) == 92) //\
+                {
                     result += template.substring(pos1, pos2 - 1);
                     result += "{";
                     pos1 = pos2 + 1;
@@ -7773,8 +7689,7 @@ window.__extends = (this && this.__extends) || (function () {
                         result += tag.substring(pos3 + 1);
                     else
                         result += value;
-                }
-                else {
+                } else {
                     value = this._templateVars[tag];
                     if (value != null)
                         result += value;
@@ -7826,7 +7741,7 @@ window.__extends = (this && this.__extends) || (function () {
             var text2 = this._text;
             if (this._templateVars != null)
                 text2 = this.parseTemplate(text2);
-            if (this._ubbEnabled)
+            if (this._ubbEnabled) //不支持同一个文本不同样式
                 text2 = fgui.UBBParser.inst.parse(fgui.ToolSet.encodeHTML(text2), true);
             this._label.string = text2;
         };
@@ -7837,9 +7752,8 @@ window.__extends = (this && this.__extends) || (function () {
                 var font = fgui.getFontByName(value);
                 if (!font) {
                     this._label.fontFamily = value;
-                    this._label.isSystemFontUsed = true;
-                }
-                else
+                    this._label.useSystemFont = true;
+                } else
                     this._label.font = font;
             }
         };
@@ -7850,8 +7764,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._node.color = this._color;
                 else
                     this._node.color = cc.Color.WHITE;
-            }
-            else
+            } else
                 this._node.color = this._color;
         };
         GTextField.prototype.updateFontSize = function () {
@@ -7870,12 +7783,10 @@ window.__extends = (this && this.__extends) || (function () {
             else if (this._autoSize == fgui.AutoSizeType.Height) {
                 this._label.overflow = cc.Label.Overflow.RESIZE_HEIGHT;
                 this._node.width = this._width;
-            }
-            else if (this._autoSize == fgui.AutoSizeType.Shrink) {
+            } else if (this._autoSize == fgui.AutoSizeType.Shrink) {
                 this._label.overflow = cc.Label.Overflow.SHRINK;
                 this._node.setContentSize(this._width, this._height);
-            }
-            else {
+            } else {
                 this._label.overflow = cc.Label.Overflow.CLAMP;
                 this._node.setContentSize(this._width, this._height);
             }
@@ -7905,8 +7816,7 @@ window.__extends = (this && this.__extends) || (function () {
                 return;
             if (this._autoSize == fgui.AutoSizeType.None || this._autoSize == fgui.AutoSizeType.Shrink) {
                 this._node.setContentSize(this._width, this._height);
-            }
-            else if (this._autoSize == fgui.AutoSizeType.Height)
+            } else if (this._autoSize == fgui.AutoSizeType.Height)
                 this._node.width = this._width;
         };
         GTextField.prototype.setup_beforeAdd = function (buffer, beginPos) {
@@ -7929,7 +7839,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this.strokeColor = buffer.readColor();
                 this.stroke = buffer.readFloat();
             }
-            if (buffer.readBool())
+            if (buffer.readBool()) //shadow
                 buffer.skip(12);
             if (buffer.readBool())
                 this._templateVars = {};
@@ -7950,6 +7860,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var RichTextImageAtlas = /** @class */ (function (_super) {
         __extends(RichTextImageAtlas, _super);
+
         function RichTextImageAtlas() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
@@ -7969,6 +7880,7 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.RichTextImageAtlas = RichTextImageAtlas;
     var GRichTextField = /** @class */ (function (_super) {
         __extends(GRichTextField, _super);
+
         function GRichTextField() {
             var _this = _super.call(this) || this;
             _this._node.name = "GRichTextField";
@@ -8087,8 +7999,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this._richText.string = text2;
                 if (this.maxWidth != 0 && this._node.width > this.maxWidth)
                     this._richText.maxWidth = this.maxWidth;
-            }
-            else
+            } else
                 this._richText.string = text2;
         };
         GRichTextField.prototype.updateFont = function (value) {
@@ -8132,6 +8043,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GRoot = /** @class */ (function (_super) {
         __extends(GRoot, _super);
+
         function GRoot() {
             var _this = _super.call(this) || this;
             _this._node.name = "GRoot";
@@ -8148,12 +8060,10 @@ window.__extends = (this && this.__extends) || (function () {
             _this._inputProcessor._captureCallback = _this.onTouchBegin_1;
             if (CC_EDITOR) {
                 cc.engine.on('design-resolution-changed', _this._thisOnResized);
-            }
-            else {
+            } else {
                 if (cc.sys.isMobile) {
                     window.addEventListener('resize', _this._thisOnResized);
-                }
-                else {
+                } else {
                     cc.view.on('canvas-resize', _this._thisOnResized);
                 }
             }
@@ -8177,12 +8087,10 @@ window.__extends = (this && this.__extends) || (function () {
         GRoot.prototype.onDestroy = function () {
             if (CC_EDITOR) {
                 cc.engine.off('design-resolution-changed', this._thisOnResized);
-            }
-            else {
+            } else {
                 if (cc.sys.isMobile) {
                     window.removeEventListener('resize', this._thisOnResized);
-                }
-                else {
+                } else {
                     cc.view.off('canvas-resize', this._thisOnResized);
                 }
             }
@@ -8309,22 +8217,22 @@ window.__extends = (this && this.__extends) || (function () {
         });
         GRoot.prototype.getPopupPosition = function (popup, target, downward, result) {
             var pos = result ? result : new cc.Vec2();
-            var sizeW = 0, sizeH = 0;
+            var sizeW = 0,
+                sizeH = 0;
             if (target) {
                 pos = target.localToGlobal();
                 var pos2 = target.localToGlobal(target.width, target.height);
                 sizeW = pos2.x - pos.x;
                 sizeH = pos2.y - pos.y;
-            }
-            else {
+            } else {
                 pos = this.getTouchPosition();
                 pos = this.globalToLocal(pos.x, pos.y);
             }
             if (pos.x + popup.width > this.width)
                 pos.x = pos.x + sizeW - popup.width;
             pos.y += sizeH;
-            if ((downward == undefined && pos.y + popup.height > this.height)
-                || downward == false) {
+            if ((downward == undefined && pos.y + popup.height > this.height) ||
+                downward == false) {
                 pos.y = pos.y - sizeH - popup.height - 1;
                 if (pos.y < 0) {
                     pos.y = 0;
@@ -8371,8 +8279,7 @@ window.__extends = (this && this.__extends) || (function () {
                     for (var i = this._popupStack.length - 1; i >= k; i--)
                         this.closePopup(this._popupStack.pop());
                 }
-            }
-            else {
+            } else {
                 var cnt = this._popupStack.length;
                 for (i = cnt - 1; i >= 0; i--)
                     this.closePopup(this._popupStack[i]);
@@ -8513,6 +8420,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GScrollBar = /** @class */ (function (_super) {
         __extends(GScrollBar, _super);
+
         function GScrollBar() {
             var _this = _super.call(this) || this;
             _this._node.name = "GScrollBar";
@@ -8530,8 +8438,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (!this._fixedGripSize)
                         this._grip.height = val * this._bar.height;
                     this._grip.y = this._bar.y + (this._bar.height - this._grip.height) * this._scrollPerc;
-                }
-                else {
+                } else {
                     if (!this._fixedGripSize)
                         this._grip.width = val * this._bar.width;
                     this._grip.x = this._bar.x + (this._bar.width - this._grip.width) * this._scrollPerc;
@@ -8600,8 +8507,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._vertical) {
                 var curY = pt.y - this._dragOffset.y;
                 this._target.setPercY((curY - this._bar.y) / (this._bar.height - this._grip.height), false);
-            }
-            else {
+            } else {
                 var curX = pt.x - this._dragOffset.x;
                 this._target.setPercX((curX - this._bar.x) / (this._bar.width - this._grip.width), false);
             }
@@ -8627,8 +8533,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._target.scrollUp(4);
                 else
                     this._target.scrollDown(4);
-            }
-            else {
+            } else {
                 if (pt.x < 0)
                     this._target.scrollLeft(4);
                 else
@@ -8644,6 +8549,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GSlider = /** @class */ (function (_super) {
         __extends(GSlider, _super);
+
         function GSlider() {
             var _this = _super.call(this) || this;
             _this._max = 0;
@@ -8729,8 +8635,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._barObjectH.width = Math.round(fullWidth * percent);
                 if (this._barObjectV)
                     this._barObjectV.height = Math.round(fullHeight * percent);
-            }
-            else {
+            } else {
                 if (this._barObjectH) {
                     this._barObjectH.width = Math.round(fullWidth * percent);
                     this._barObjectH.x = this._barStartX + (fullWidth - this._barObjectH.width);
@@ -8856,6 +8761,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GTextInput = /** @class */ (function (_super) {
         __extends(GTextInput, _super);
+
         function GTextInput() {
             var _this = _super.call(this) || this;
             _this._node.name = "GTextInput";
@@ -8924,8 +8830,7 @@ window.__extends = (this && this.__extends) || (function () {
         });
         Object.defineProperty(GTextInput.prototype, "password", {
             get: function () {
-                return this._editBox.inputFlag == cc.EditBox.InputFlag.PASSWORD;
-                ;
+                return this._editBox.inputFlag == cc.EditBox.InputFlag.PASSWORD;;
             },
             set: function (val) {
                 this._editBox.inputFlag = val ? cc.EditBox.InputFlag.PASSWORD : cc.EditBox.InputFlag.DEFAULT;
@@ -8983,7 +8888,7 @@ window.__extends = (this && this.__extends) || (function () {
             var text2 = this._text;
             if (this._templateVars != null)
                 text2 = this.parseTemplate(text2);
-            if (this._ubbEnabled)
+            if (this._ubbEnabled) //不支持同一个文本不同样式
                 text2 = fgui.UBBParser.inst.parse(fgui.ToolSet.encodeHTML(text2), true);
             this._editBox.string = text2;
         };
@@ -9019,7 +8924,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (iv != 0)
                 this.maxLength = iv;
             iv = buffer.readInt();
-            if (iv != 0) {
+            if (iv != 0) { //keyboardType
             }
             if (buffer.readBool())
                 this.password = true;
@@ -9029,6 +8934,7 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.GTextInput = GTextInput;
     var MyEditBox = /** @class */ (function (_super) {
         __extends(MyEditBox, _super);
+
         function MyEditBox() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
@@ -9091,7 +8997,9 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var PopupMenu = /** @class */ (function () {
         function PopupMenu(url) {
-            if (url === void 0) { url = null; }
+            if (url === void 0) {
+                url = null;
+            }
             if (!url) {
                 url = fgui.UIConfig.popupMenu;
                 if (!url)
@@ -9161,8 +9069,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (checkable) {
                     if (c.selectedIndex == 0)
                         c.selectedIndex = 1;
-                }
-                else
+                } else
                     c.selectedIndex = 0;
             }
         };
@@ -9186,8 +9093,7 @@ window.__extends = (this && this.__extends) || (function () {
                 var index = this._list.getChildIndex(item);
                 this._list.removeChildToPoolAt(index);
                 return true;
-            }
-            else
+            } else
                 return false;
         };
         PopupMenu.prototype.clearItems = function () {
@@ -9215,7 +9121,9 @@ window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         PopupMenu.prototype.show = function (target, downward) {
-            if (target === void 0) { target = null; }
+            if (target === void 0) {
+                target = null;
+            }
             var r = target != null ? target.root : fgui.GRoot.inst;
             r.showPopup(this.contentPane, (target instanceof fgui.GRoot) ? null : target, downward);
         };
@@ -9310,8 +9218,8 @@ window.__extends = (this && this.__extends) || (function () {
             this._defs.push(info);
             //当使用中线关联时，因为需要除以2，很容易因为奇数宽度/高度造成小数点坐标；当使用百分比时，也会造成小数坐标；
             //所以设置了这类关联的对象，自动启用pixelSnapping
-            if (usePercent || relationType == fgui.RelationType.Left_Center || relationType == fgui.RelationType.Center_Center || relationType == fgui.RelationType.Right_Center
-                || relationType == fgui.RelationType.Top_Middle || relationType == fgui.RelationType.Middle_Middle || relationType == fgui.RelationType.Bottom_Middle)
+            if (usePercent || relationType == fgui.RelationType.Left_Center || relationType == fgui.RelationType.Center_Center || relationType == fgui.RelationType.Right_Center ||
+                relationType == fgui.RelationType.Top_Middle || relationType == fgui.RelationType.Middle_Middle || relationType == fgui.RelationType.Bottom_Middle)
                 this._owner.pixelSnapping = true;
         };
         RelationItem.prototype.remove = function (relationType) {
@@ -9442,7 +9350,9 @@ window.__extends = (this && this.__extends) || (function () {
             }
         };
         RelationItem.prototype.applyOnSizeChanged = function (info) {
-            var pos = 0, pivot = 0, delta = 0;
+            var pos = 0,
+                pivot = 0,
+                delta = 0;
             var v, tmp;
             if (info.axis == 0) {
                 if (this._target != this._owner.parent) {
@@ -9453,11 +9363,9 @@ window.__extends = (this && this.__extends) || (function () {
                 if (info.percent) {
                     if (this._targetWidth != 0)
                         delta = this._target._width / this._targetWidth;
-                }
-                else
+                } else
                     delta = this._target._width - this._targetWidth;
-            }
-            else {
+            } else {
                 if (this._target != this._owner.parent) {
                     pos = this._target.y;
                     if (this._target.pivotAsAnchor)
@@ -9466,8 +9374,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (info.percent) {
                     if (this._targetHeight != 0)
                         delta = this._target._height / this._targetHeight;
-                }
-                else
+                } else
                     delta = this._target._height - this._targetHeight;
             }
             switch (info.type) {
@@ -9567,11 +9474,9 @@ window.__extends = (this && this.__extends) || (function () {
                             tmp = this._owner.xMin;
                             this._owner.setSize(this._target._width + v, this._owner._rawHeight, true);
                             this._owner.xMin = tmp;
-                        }
-                        else
+                        } else
                             this._owner.setSize(this._target._width + v, this._owner._rawHeight, true);
-                    }
-                    else
+                    } else
                         this._owner.width = this._target._width + v;
                     break;
                 case fgui.RelationType.Height:
@@ -9586,11 +9491,9 @@ window.__extends = (this && this.__extends) || (function () {
                             tmp = this._owner.yMin;
                             this._owner.setSize(this._owner._rawWidth, this._target._height + v, true);
                             this._owner.yMin = tmp;
-                        }
-                        else
+                        } else
                             this._owner.setSize(this._owner._rawWidth, this._target._height + v, true);
-                    }
-                    else
+                    } else
                         this._owner.height = this._target._height + v;
                     break;
                 case fgui.RelationType.LeftExt_Left:
@@ -9626,24 +9529,21 @@ window.__extends = (this && this.__extends) || (function () {
                         if (this._owner == this._target.parent) {
                             if (this._owner._underConstruct)
                                 this._owner.width = pos + this._target._width - this._target._width * pivot +
-                                    (this._owner.sourceWidth - pos - this._target.initWidth + this._target.initWidth * pivot) * delta;
+                                (this._owner.sourceWidth - pos - this._target.initWidth + this._target.initWidth * pivot) * delta;
                             else
                                 this._owner.width = pos + (this._owner._rawWidth - pos) * delta;
-                        }
-                        else {
+                        } else {
                             v = pos + (tmp + this._owner._rawWidth - pos) * delta - (tmp + this._owner._rawWidth);
                             this._owner.width = this._owner._rawWidth + v;
                             this._owner.xMin = tmp;
                         }
-                    }
-                    else {
+                    } else {
                         if (this._owner == this._target.parent) {
                             if (this._owner._underConstruct)
                                 this._owner.width = this._owner.sourceWidth + (this._target._width - this._target.initWidth) * (1 - pivot);
                             else
                                 this._owner.width = this._owner._rawWidth + delta * (1 - pivot);
-                        }
-                        else {
+                        } else {
                             v = delta * (1 - pivot);
                             this._owner.width = this._owner._rawWidth + v;
                             this._owner.xMin = tmp;
@@ -9683,24 +9583,21 @@ window.__extends = (this && this.__extends) || (function () {
                         if (this._owner == this._target.parent) {
                             if (this._owner._underConstruct)
                                 this._owner.height = pos + this._target._height - this._target._height * pivot +
-                                    (this._owner.sourceHeight - pos - this._target.initHeight + this._target.initHeight * pivot) * delta;
+                                (this._owner.sourceHeight - pos - this._target.initHeight + this._target.initHeight * pivot) * delta;
                             else
                                 this._owner.height = pos + (this._owner._rawHeight - pos) * delta;
-                        }
-                        else {
+                        } else {
                             v = pos + (tmp + this._owner._rawHeight - pos) * delta - (tmp + this._owner._rawHeight);
                             this._owner.height = this._owner._rawHeight + v;
                             this._owner.yMin = tmp;
                         }
-                    }
-                    else {
+                    } else {
                         if (this._owner == this._target.parent) {
                             if (this._owner._underConstruct)
                                 this._owner.height = this._owner.sourceHeight + (this._target._height - this._target.initHeight) * (1 - pivot);
                             else
                                 this._owner.height = this._owner._rawHeight + delta * (1 - pivot);
-                        }
-                        else {
+                        } else {
                             v = delta * (1 - pivot);
                             this._owner.height = this._owner._rawHeight + v;
                             this._owner.yMin = tmp;
@@ -9801,8 +9698,7 @@ window.__extends = (this && this.__extends) || (function () {
     }());
     fgui.RelationItem = RelationItem;
     var RelationDef = /** @class */ (function () {
-        function RelationDef() {
-        }
+        function RelationDef() {}
         RelationDef.prototype.copyFrom = function (source) {
             this.percent = source.percent;
             this.type = source.type;
@@ -9834,7 +9730,9 @@ window.__extends = (this && this.__extends) || (function () {
             this._items.push(newItem);
         };
         Relations.prototype.remove = function (target, relationType) {
-            if (relationType === void 0) { relationType = 0; }
+            if (relationType === void 0) {
+                relationType = 0;
+            }
             var cnt = this._items.length;
             var i = 0;
             while (i < cnt) {
@@ -9845,11 +9743,9 @@ window.__extends = (this && this.__extends) || (function () {
                         item.dispose();
                         this._items.splice(i, 1);
                         cnt--;
-                    }
-                    else
+                    } else
                         i++;
-                }
-                else
+                } else
                     i++;
             }
         };
@@ -9871,8 +9767,7 @@ window.__extends = (this && this.__extends) || (function () {
                     item.dispose();
                     this._items.splice(i, 1);
                     cnt--;
-                }
-                else
+                } else
                     i++;
             }
         };
@@ -9954,6 +9849,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var ScrollPane = /** @class */ (function (_super) {
         __extends(ScrollPane, _super);
+
         function ScrollPane() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
@@ -10408,8 +10304,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._pageMode)
                 this.setPosY(this._yPos - this._pageSize.y * ratio, ani);
             else
-                this.setPosY(this._yPos - this._scrollStep * ratio, ani);
-            ;
+                this.setPosY(this._yPos - this._scrollStep * ratio, ani);;
         };
         ScrollPane.prototype.scrollDown = function (ratio, ani) {
             if (ratio == undefined)
@@ -10444,16 +10339,14 @@ window.__extends = (this && this.__extends) || (function () {
                 if (target.parent != this._owner) {
                     target.parent.localToGlobalRect(target.x, target.y, target.width, target.height, ScrollPane.sHelperRect);
                     rect = this._owner.globalToLocalRect(ScrollPane.sHelperRect.x, ScrollPane.sHelperRect.y, ScrollPane.sHelperRect.width, ScrollPane.sHelperRect.height, ScrollPane.sHelperRect);
-                }
-                else {
+                } else {
                     rect = ScrollPane.sHelperRect;
                     rect.x = target.x;
                     rect.y = target.y;
                     rect.width = target.width;
                     rect.height = target.height;
                 }
-            }
-            else
+            } else
                 rect = target;
             if (this._overlapSize.y > 0) {
                 var bottom = this._yPos + this._viewSize.y;
@@ -10462,8 +10355,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this.setPosY(Math.floor(rect.y / this._pageSize.y) * this._pageSize.y, ani);
                     else
                         this.setPosY(rect.y, ani);
-                }
-                else if (rect.y + rect.height > bottom) {
+                } else if (rect.y + rect.height > bottom) {
                     if (this._pageMode)
                         this.setPosY(Math.floor(rect.y / this._pageSize.y) * this._pageSize.y, ani);
                     else if (rect.height <= this._viewSize.y / 2)
@@ -10479,8 +10371,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this.setPosX(Math.floor(rect.x / this._pageSize.x) * this._pageSize.x, ani);
                     else
                         this.setPosX(rect.x, ani);
-                }
-                else if (rect.x + rect.width > right) {
+                } else if (rect.x + rect.width > right) {
                     if (this._pageMode)
                         this.setPosX(Math.floor(rect.x / this._pageSize.x) * this._pageSize.x, ani);
                     else if (rect.width <= this._viewSize.x / 2)
@@ -10596,8 +10487,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this._hzScrollBar.x = this._scrollBarMargin.left + this._vtScrollBar.width;
                     else
                         this._hzScrollBar.x = this._scrollBarMargin.left;
-                }
-                else {
+                } else {
                     this._hzScrollBar.width = aWidth - this._scrollBarMargin.left - this._scrollBarMargin.right;
                     this._hzScrollBar.x = this._scrollBarMargin.left;
                 }
@@ -10649,8 +10539,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._yPos = this._overlapSize.y;
                     this._tweenChange.y = -this._yPos - this._tweenStart.y;
                 }
-            }
-            else if (this._tweening == 2) {
+            } else if (this._tweening == 2) {
                 //重新调整起始位置，确保能够顺滑滚下去
                 if (deltaPosX != 0) {
                     this._container.x -= deltaPosX;
@@ -10662,8 +10551,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._tweenStart.y -= deltaPosY;
                     this._yPos = -(-this._container.y);
                 }
-            }
-            else if (this.isDragged) {
+            } else if (this.isDragged) {
                 if (deltaPosX != 0) {
                     this._container.x -= deltaPosX;
                     this._containerPos.x -= deltaPosX;
@@ -10674,8 +10562,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._containerPos.y -= deltaPosY;
                     this._yPos = -(-this._container.y);
                 }
-            }
-            else {
+            } else {
                 //如果原来滚动位置是贴边，加入处理继续贴边。
                 if (deltaWidth != 0 && isRightmost) {
                     this._xPos = this._overlapSize.x;
@@ -10697,8 +10584,7 @@ window.__extends = (this && this.__extends) || (function () {
                             this._vScrollNone = true;
                             this._viewSize.x += this._vtScrollBar.width;
                         }
-                    }
-                    else {
+                    } else {
                         if (this._vScrollNone) {
                             this._vScrollNone = false;
                             this._viewSize.x -= this._vtScrollBar.width;
@@ -10711,8 +10597,7 @@ window.__extends = (this && this.__extends) || (function () {
                             this._hScrollNone = true;
                             this._viewSize.y += this._hzScrollBar.height;
                         }
-                    }
-                    else {
+                    } else {
                         if (this._hScrollNone) {
                             this._hScrollNone = false;
                             this._viewSize.y -= this._hzScrollBar.height;
@@ -10810,7 +10695,8 @@ window.__extends = (this && this.__extends) || (function () {
             }
             this.refresh2();
             this._owner.node.emit(fgui.Event.SCROLL, this._owner);
-            if (this._needRefresh) {
+            if (this._needRefresh) //在onScroll事件里开发者可能修改位置，这里再刷新一次，避免闪烁
+            {
                 this._needRefresh = false;
                 this.unschedule(this.refresh);
                 this.refresh2();
@@ -10844,11 +10730,9 @@ window.__extends = (this && this.__extends) || (function () {
                     this._tweenStart.y = (-this._container.y);
                     this._tweenChange.x = posX - this._tweenStart.x;
                     this._tweenChange.y = posY - this._tweenStart.y;
-                }
-                else if (this._tweening != 0)
+                } else if (this._tweening != 0)
                     this.killTween();
-            }
-            else {
+            } else {
                 if (this._tweening != 0)
                     this.killTween();
                 this._container.setPosition(Math.floor(-this._xPos), -Math.floor(-this._yPos));
@@ -10877,8 +10761,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this.killTween();
                 fgui.GRoot.inst.inputProcessor.cancelClick(evt.touchId);
                 this.isDragged = true;
-            }
-            else
+            } else
                 this.isDragged = false;
             var pt = this._owner.globalToLocal(evt.pos.x, evt.pos.y, ScrollPane.sHelperPoint);
             this._containerPos.x = this._container.x;
@@ -10887,8 +10770,7 @@ window.__extends = (this && this.__extends) || (function () {
             this._lastTouchPos.set(pt);
             this._lastTouchGlobalPos.set(evt.pos);
             this._isHoldAreaDone = false;
-            this._velocity.set(cc.Vec2.ZERO);
-            ;
+            this._velocity.set(cc.Vec2.ZERO);;
             this._velocityScale = 1;
             this._lastMoveTime = fgui.ToolSet.getTime();
         };
@@ -10897,7 +10779,7 @@ window.__extends = (this && this.__extends) || (function () {
                 return;
             if (!this._touchEffect)
                 return;
-            if (ScrollPane.draggingPane != null && ScrollPane.draggingPane != this || fgui.GObject.draggingObject != null)
+            if (ScrollPane.draggingPane != null && ScrollPane.draggingPane != this || fgui.GObject.draggingObject != null) //已经有其他拖动
                 return;
             var pt = this._owner.globalToLocal(evt.pos.x, evt.pos.y, ScrollPane.sHelperPoint);
             var sensitivity = fgui.UIConfig.touchScrollSensitivity;
@@ -10910,15 +10792,15 @@ window.__extends = (this && this.__extends) || (function () {
                     diff = Math.abs(this._beginTouchPos.y - pt.y);
                     if (diff < sensitivity)
                         return;
-                    if ((ScrollPane._gestureFlag & 2) != 0) {
+                    if ((ScrollPane._gestureFlag & 2) != 0) //已经有水平方向的手势在监测，那么我们用严格的方式检查是不是按垂直方向移动，避免冲突
+                    {
                         diff2 = Math.abs(this._beginTouchPos.x - pt.x);
-                        if (diff < diff2)
+                        if (diff < diff2) //不通过则不允许滚动了
                             return;
                     }
                 }
                 sv = true;
-            }
-            else if (this._scrollType == fgui.ScrollType.Horizontal) {
+            } else if (this._scrollType == fgui.ScrollType.Horizontal) {
                 if (!this._isHoldAreaDone) {
                     ScrollPane._gestureFlag |= 2;
                     diff = Math.abs(this._beginTouchPos.x - pt.x);
@@ -10931,8 +10813,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                 }
                 sh = true;
-            }
-            else {
+            } else {
                 ScrollPane._gestureFlag = 3;
                 if (!this._isHoldAreaDone) {
                     diff = Math.abs(this._beginTouchPos.y - pt.y);
@@ -10954,16 +10835,14 @@ window.__extends = (this && this.__extends) || (function () {
                         this._container.y = -Math.floor(Math.min(newPosY * 0.5, this._header.maxHeight));
                     else
                         this._container.y = -Math.floor(Math.min(newPosY * 0.5, this._viewSize.y * ScrollPane.PULL_RATIO));
-                }
-                else if (newPosY < -this._overlapSize.y) {
+                } else if (newPosY < -this._overlapSize.y) {
                     if (!this._bouncebackEffect)
                         this._container.y = this._overlapSize.y;
                     else if (this._footer != null && this._footer.maxHeight > 0)
                         this._container.y = -Math.floor(Math.max((newPosY + this._overlapSize.y) * 0.5, -this._footer.maxHeight) - this._overlapSize.y);
                     else
                         this._container.y = -Math.floor(Math.max((newPosY + this._overlapSize.y) * 0.5, -this._viewSize.y * ScrollPane.PULL_RATIO) - this._overlapSize.y);
-                }
-                else
+                } else
                     this._container.y = -newPosY;
             }
             if (sh) {
@@ -10974,16 +10853,14 @@ window.__extends = (this && this.__extends) || (function () {
                         this._container.x = Math.floor(Math.min(newPosX * 0.5, this._header.maxWidth));
                     else
                         this._container.x = Math.floor(Math.min(newPosX * 0.5, this._viewSize.x * ScrollPane.PULL_RATIO));
-                }
-                else if (newPosX < 0 - this._overlapSize.x) {
+                } else if (newPosX < 0 - this._overlapSize.x) {
                     if (!this._bouncebackEffect)
                         this._container.x = -this._overlapSize.x;
                     else if (this._footer != null && this._footer.maxWidth > 0)
                         this._container.x = Math.floor(Math.max((newPosX + this._overlapSize.x) * 0.5, -this._footer.maxWidth) - this._overlapSize.x);
                     else
                         this._container.x = Math.floor(Math.max((newPosX + this._overlapSize.x) * 0.5, -this._viewSize.x * ScrollPane.PULL_RATIO) - this._overlapSize.x);
-                }
-                else
+                } else
                     this._container.x = newPosX;
             }
             //更新速度
@@ -10998,7 +10875,8 @@ window.__extends = (this && this.__extends) || (function () {
             if (deltaTime != 0) {
                 var frameRate = 60;
                 var elapsed = deltaTime * frameRate - 1;
-                if (elapsed > 1) {
+                if (elapsed > 1) //速度衰减
+                {
                     var factor = Math.pow(0.833, elapsed);
                     this._velocity.x = this._velocity.x * factor;
                     this._velocity.y = this._velocity.y * factor;
@@ -11007,7 +10885,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this._velocity.y = fgui.ToolSet.lerp(this._velocity.y, deltaPositionY * 60 / frameRate / deltaTime, deltaTime * 10);
             }
             /*速度计算使用的是本地位移，但在后续的惯性滚动判断中需要用到屏幕位移，所以这里要记录一个位移的比例。
-            */
+             */
             var deltaGlobalPositionX = this._lastTouchGlobalPos.x - evt.pos.x;
             var deltaGlobalPositionY = this._lastTouchGlobalPos.y - evt.pos.y;
             if (deltaPositionX != 0)
@@ -11057,16 +10935,14 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._container.x > 0) {
                 ScrollPane.sEndPos.x = 0;
                 flag = true;
-            }
-            else if (this._container.x < -this._overlapSize.x) {
+            } else if (this._container.x < -this._overlapSize.x) {
                 ScrollPane.sEndPos.x = -this._overlapSize.x;
                 flag = true;
             }
             if ((-this._container.y) > 0) {
                 ScrollPane.sEndPos.y = 0;
                 flag = true;
-            }
-            else if ((-this._container.y) < -this._overlapSize.y) {
+            } else if ((-this._container.y) < -this._overlapSize.y) {
                 ScrollPane.sEndPos.y = -this._overlapSize.y;
                 flag = true;
             }
@@ -11077,8 +10953,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._refreshEventDispatching = true;
                     this._owner.node.emit(fgui.Event.PULL_DOWN_RELEASE), this._owner;
                     this._refreshEventDispatching = false;
-                }
-                else if (this._tweenChange.x > fgui.UIConfig.touchDragSensitivity || this._tweenChange.y > fgui.UIConfig.touchDragSensitivity) {
+                } else if (this._tweenChange.x > fgui.UIConfig.touchDragSensitivity || this._tweenChange.y > fgui.UIConfig.touchDragSensitivity) {
                     this._refreshEventDispatching = true;
                     this._owner.node.emit(fgui.Event.PULL_UP_RELEASE, this._owner);
                     this._refreshEventDispatching = false;
@@ -11087,8 +10962,7 @@ window.__extends = (this && this.__extends) || (function () {
                     ScrollPane.sEndPos[this._refreshBarAxis] = this._headerLockedSize;
                     this._tweenChange.x = ScrollPane.sEndPos.x - this._tweenStart.x;
                     this._tweenChange.y = ScrollPane.sEndPos.y - this._tweenStart.y;
-                }
-                else if (this._footerLockedSize > 0 && ScrollPane.sEndPos[this._refreshBarAxis] == -this._overlapSize[this._refreshBarAxis]) {
+                } else if (this._footerLockedSize > 0 && ScrollPane.sEndPos[this._refreshBarAxis] == -this._overlapSize[this._refreshBarAxis]) {
                     var max = this._overlapSize[this._refreshBarAxis];
                     if (max == 0)
                         max = Math.max(this._contentSize[this._refreshBarAxis] + this._footerLockedSize - this._viewSize[this._refreshBarAxis], 0);
@@ -11099,8 +10973,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._tweenChange.y = ScrollPane.sEndPos.y - this._tweenStart.y;
                 }
                 this._tweenDuration.x = this._tweenDuration.y = ScrollPane.TWEEN_TIME_DEFAULT;
-            }
-            else {
+            } else {
                 //更新速度
                 if (!this._inertiaDisabled) {
                     var frameRate = 60;
@@ -11112,8 +10985,7 @@ window.__extends = (this && this.__extends) || (function () {
                     }
                     //根据速度计算目标位置和需要时间
                     this.updateTargetAndDuration(this._tweenStart, ScrollPane.sEndPos);
-                }
-                else
+                } else
                     this._tweenDuration.x = this._tweenDuration.y = ScrollPane.TWEEN_TIME_DEFAULT;
                 ScrollPane.sOldChange.x = ScrollPane.sEndPos.x - this._tweenStart.x;
                 ScrollPane.sOldChange.y = ScrollPane.sEndPos.y - this._tweenStart.y;
@@ -11152,8 +11024,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.setPosX(this._xPos + this._pageSize.x * delta, false);
                 else
                     this.setPosX(this._xPos + this._mouseWheelStep * delta, false);
-            }
-            else {
+            } else {
                 if (this._pageMode)
                     this.setPosY(this._yPos + this._pageSize.y * delta, false);
                 else
@@ -11164,8 +11035,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (val) {
                 this._showScrollBar(NaN);
                 this.unschedule(this._showScrollBar);
-            }
-            else {
+            } else {
                 if (!cc.director.getScheduler().isScheduled(this._showScrollBar, this))
                     this.scheduleOnce(this._showScrollBar, 0.5);
             }
@@ -11187,18 +11057,15 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._xPos < 0.001) {
                     this._xPos += this.getLoopPartSize(2, "x");
                     changed = true;
-                }
-                else if (this._xPos >= this._overlapSize.x) {
+                } else if (this._xPos >= this._overlapSize.x) {
                     this._xPos -= this.getLoopPartSize(2, "x");
                     changed = true;
                 }
-            }
-            else if (this._loop == 2 && this._overlapSize.y > 0) {
+            } else if (this._loop == 2 && this._overlapSize.y > 0) {
                 if (this._yPos < 0.001) {
                     this._yPos += this.getLoopPartSize(2, "y");
                     changed = true;
-                }
-                else if (this._yPos >= this._overlapSize.y) {
+                } else if (this._yPos >= this._overlapSize.y) {
                     this._yPos -= this.getLoopPartSize(2, "y");
                     changed = true;
                 }
@@ -11224,8 +11091,7 @@ window.__extends = (this && this.__extends) || (function () {
                     endPos[axis] -= halfSize;
                     this._tweenStart[axis] = tmp;
                 }
-            }
-            else if (endPos[axis] < -this._overlapSize[axis]) {
+            } else if (endPos[axis] < -this._overlapSize[axis]) {
                 halfSize = this.getLoopPartSize(2, axis);
                 tmp = this._tweenStart[axis] + halfSize;
                 if (tmp <= 0 && tmp >= -this._overlapSize[axis]) {
@@ -11248,8 +11114,7 @@ window.__extends = (this && this.__extends) || (function () {
                     pos = fgui.ToolSet.clamp(pos + v, 0, this._overlapSize[axis]);
                     changed = true;
                 }
-            }
-            else if (value >= this._overlapSize[axis]) {
+            } else if (value >= this._overlapSize[axis]) {
                 value -= this.getLoopPartSize(2, axis);
                 if (value < pos) {
                     v = this.getLoopPartSize(6, axis);
@@ -11270,8 +11135,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._pageMode) {
                 pos.x = this.alignByPage(pos.x, "x", inertialScrolling);
                 pos.y = this.alignByPage(pos.y, "y", inertialScrolling);
-            }
-            else if (this._snapToItem) {
+            } else if (this._snapToItem) {
                 var pt = this._owner.getSnappingPosition(-pos.x, -pos.y, ScrollPane.sHelperPoint);
                 if (pos.x < 0 && pos.x > -this._overlapSize.x)
                     pos.x = -pt.x;
@@ -11291,17 +11155,18 @@ window.__extends = (this && this.__extends) || (function () {
                 var testPageSize = Math.min(this._pageSize[axis], this._contentSize[axis] - (page + 1) * this._pageSize[axis]);
                 var delta = -pos - page * this._pageSize[axis];
                 //页面吸附策略
-                if (Math.abs(change) > this._pageSize[axis]) {
+                if (Math.abs(change) > this._pageSize[axis]) //如果滚动距离超过1页,则需要超过页面的一半，才能到更下一页
+                {
                     if (delta > testPageSize * 0.5)
                         page++;
-                }
-                else {
+                } else //否则只需要页面的1/3，当然，需要考虑到左移和右移的情况
+                {
                     if (delta > testPageSize * (change < 0 ? 0.3 : 0.7))
                         page++;
                 }
                 //重新计算终点
                 pos = -page * this._pageSize[axis];
-                if (pos < -this._overlapSize[axis])
+                if (pos < -this._overlapSize[axis]) //最后一页未必有pageSize那么大
                     pos = -this._overlapSize[axis];
             }
             //惯性滚动模式下，会增加判断尽量不要滚动超过一页
@@ -11348,8 +11213,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._pageMode || !isMobile) {
                     if (v2 > 500)
                         ratio = Math.pow((v2 - 500) / 500, 2);
-                }
-                else {
+                } else {
                     if (v2 > 1000)
                         ratio = Math.pow((v2 - 1000) / 1000, 2);
                 }
@@ -11382,7 +11246,8 @@ window.__extends = (this && this.__extends) || (function () {
             this._tweenDuration[axis] = newDuration;
         };
         ScrollPane.prototype.killTween = function () {
-            if (this._tweening == 1) {
+            if (this._tweening == 1) //取消类型为1的tween需立刻设置到终点
+            {
                 this._container.setPosition(this._tweenStart.x + this._tweenChange.x, -(this._tweenStart.y + this._tweenChange.y));
                 this._owner.node.emit(fgui.Event.SCROLL, this._owner);
             }
@@ -11401,8 +11266,7 @@ window.__extends = (this && this.__extends) || (function () {
                     pt.y = this._header.height;
                     pt[this._refreshBarAxis] = pos;
                     this._header.setSize(pt.x, pt.y);
-                }
-                else {
+                } else {
                     this._header.node.active = false;
                 }
             }
@@ -11425,8 +11289,7 @@ window.__extends = (this && this.__extends) || (function () {
                     else
                         pt[this._refreshBarAxis] = this._viewSize[this._refreshBarAxis] - this._footer[this._refreshBarAxis];
                     this._footer.setSize(pt.x, pt.y);
-                }
-                else {
+                } else {
                     this._footer.node.active = false;
                 }
             }
@@ -11452,8 +11315,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this.checkRefreshBar();
                 this._owner.node.emit(fgui.Event.SCROLL, this._owner);
                 this._owner.node.emit(fgui.Event.SCROLL_END, this._owner);
-            }
-            else {
+            } else {
                 this.syncScrollBar(false);
                 this.checkRefreshBar();
                 this._owner.node.emit(fgui.Event.SCROLL, this._owner);
@@ -11467,8 +11329,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._tweenTime[axis] >= this._tweenDuration[axis]) {
                     newValue = this._tweenStart[axis] + this._tweenChange[axis];
                     this._tweenChange[axis] = 0;
-                }
-                else {
+                } else {
                     var ratio = ScrollPane.easeFunc(this._tweenTime[axis], this._tweenDuration[axis]);
                     newValue = this._tweenStart[axis] + Math.floor(this._tweenChange[axis] * ratio);
                 }
@@ -11485,33 +11346,31 @@ window.__extends = (this && this.__extends) || (function () {
                     threshold2 = -max;
                 }
                 if (this._tweening == 2 && this._bouncebackEffect) {
-                    if (newValue > 20 + threshold1 && this._tweenChange[axis] > 0
-                        || newValue > threshold1 && this._tweenChange[axis] == 0) {
+                    if (newValue > 20 + threshold1 && this._tweenChange[axis] > 0 ||
+                        newValue > threshold1 && this._tweenChange[axis] == 0) //开始回弹
+                    {
                         this._tweenTime[axis] = 0;
                         this._tweenDuration[axis] = ScrollPane.TWEEN_TIME_DEFAULT;
                         this._tweenChange[axis] = -newValue + threshold1;
                         this._tweenStart[axis] = newValue;
-                    }
-                    else if (newValue < threshold2 - 20 && this._tweenChange[axis] < 0
-                        || newValue < threshold2 && this._tweenChange[axis] == 0) {
+                    } else if (newValue < threshold2 - 20 && this._tweenChange[axis] < 0 ||
+                        newValue < threshold2 && this._tweenChange[axis] == 0) //开始回弹
+                    {
                         this._tweenTime[axis] = 0;
                         this._tweenDuration[axis] = ScrollPane.TWEEN_TIME_DEFAULT;
                         this._tweenChange[axis] = threshold2 - newValue;
                         this._tweenStart[axis] = newValue;
                     }
-                }
-                else {
+                } else {
                     if (newValue > threshold1) {
                         newValue = threshold1;
                         this._tweenChange[axis] = 0;
-                    }
-                    else if (newValue < threshold2) {
+                    } else if (newValue < threshold2) {
                         newValue = threshold2;
                         this._tweenChange[axis] = 0;
                     }
                 }
-            }
-            else
+            } else
                 newValue = (axis == "x" ? this._container.x : (-this._container.y));
             return newValue;
         };
@@ -11573,8 +11432,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._autoPlay) {
                     if (this._owner.onStage)
                         this.play(null, this._autoPlayTimes, this._autoPlayDelay);
-                }
-                else {
+                } else {
                     if (!this._owner.onStage)
                         this.stop(false, true);
                 }
@@ -11605,15 +11463,15 @@ window.__extends = (this && this.__extends) || (function () {
                         item.target = this._owner.getChildById(item.targetId);
                     else
                         item.target = this._owner;
-                }
-                else if (item.target != this._owner && item.target.parent != this._owner)
+                } else if (item.target != this._owner && item.target.parent != this._owner)
                     item.target = null;
                 if (item.target != null && item.type == TransitionActionType.Transition) {
                     var trans = item.target.getTransition(item.value.transName);
                     if (trans == this)
                         trans = null;
                     if (trans != null) {
-                        if (item.value.playTimes == 0) {
+                        if (item.value.playTimes == 0) //stop
+                        {
                             var j;
                             for (j = i - 1; j >= 0; j--) {
                                 var item2 = this._items[j];
@@ -11628,8 +11486,7 @@ window.__extends = (this && this.__extends) || (function () {
                                 item.value.stopTime = 0;
                             else
                                 trans = null; //no need to handle stop anymore
-                        }
-                        else
+                        } else
                             item.value.stopTime = -1;
                     }
                     item.value.trans = trans;
@@ -11659,8 +11516,7 @@ window.__extends = (this && this.__extends) || (function () {
                         continue;
                     this.stopItem(item, setToComplete);
                 }
-            }
-            else {
+            } else {
                 for (i = 0; i < cnt; i++) {
                     item = this._items[i];
                     if (item.target == null)
@@ -11680,7 +11536,8 @@ window.__extends = (this && this.__extends) || (function () {
             if (item.tweener != null) {
                 item.tweener.kill(setToComplete);
                 item.tweener = null;
-                if (item.type == TransitionActionType.Shake && !setToComplete) {
+                if (item.type == TransitionActionType.Shake && !setToComplete) //震动必须归位，否则下次就越震越远了。
+                {
                     item.target._gearLocked = true;
                     item.target.setPosition(item.target.x - item.value.lastOffsetX, item.target.y - item.value.lastOffsetY);
                     item.target._gearLocked = false;
@@ -11707,13 +11564,11 @@ window.__extends = (this && this.__extends) || (function () {
                 if (item.type == TransitionActionType.Transition) {
                     if (item.value.trans != null)
                         item.value.trans.setPaused(paused);
-                }
-                else if (item.type == TransitionActionType.Animation) {
+                } else if (item.type == TransitionActionType.Animation) {
                     if (paused) {
                         item.value.flag = (item.target).playing;
                         (item.target).playing = false;
-                    }
-                    else
+                    } else
                         (item.target).playing = item.value.flag;
                 }
                 if (item.tweener != null)
@@ -11760,11 +11615,9 @@ window.__extends = (this && this.__extends) || (function () {
                         value = item.tweenConfig.startValue;
                     else
                         value = item.value;
-                }
-                else if (item.tweenConfig != null && item.tweenConfig.endLabel == label) {
+                } else if (item.tweenConfig != null && item.tweenConfig.endLabel == label) {
                     value = item.tweenConfig.endValue;
-                }
-                else
+                } else
                     continue;
                 switch (item.type) {
                     case TransitionActionType.XY:
@@ -11829,8 +11682,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (item.label == label) {
                     item.hook = callback;
                     break;
-                }
-                else if (item.tweenConfig != null && item.tweenConfig.endLabel == label) {
+                } else if (item.tweenConfig != null && item.tweenConfig.endLabel == label) {
                     item.tweenConfig.endHook = callback;
                     break;
                 }
@@ -11890,8 +11742,7 @@ window.__extends = (this && this.__extends) || (function () {
                             else if (item.type == TransitionActionType.Transition) {
                                 if (item.value.trans != null)
                                     item.value.trans.timeScale = value;
-                            }
-                            else if (item.type == TransitionActionType.Animation) {
+                            } else if (item.type == TransitionActionType.Animation) {
                                 if (item.target != null)
                                     (item.target).timeScale = value;
                             }
@@ -11914,8 +11765,7 @@ window.__extends = (this && this.__extends) || (function () {
                         item.tweenConfig.startValue.f2 += dy;
                         item.tweenConfig.endValue.f1 += dx;
                         item.tweenConfig.endValue.f2 += dy;
-                    }
-                    else {
+                    } else {
                         item.value.f1 += dx;
                         item.value.f2 += dy;
                     }
@@ -11942,8 +11792,7 @@ window.__extends = (this && this.__extends) || (function () {
                             item.displayLockToken = item.target.addDisplayLock();
                     }
                 }
-            }
-            else if (this._onComplete != null) {
+            } else if (this._onComplete != null) {
                 var func = this._onComplete;
                 this._onComplete = null;
                 func();
@@ -11965,12 +11814,10 @@ window.__extends = (this && this.__extends) || (function () {
                     if (item.type == TransitionActionType.Animation && this._startTime != 0 && item.time <= this._startTime) {
                         needSkipAnimations = true;
                         item.value.flag = false;
-                    }
-                    else
+                    } else
                         this.playItem(item);
                 }
-            }
-            else {
+            } else {
                 for (i = cnt - 1; i >= 0; i--) {
                     item = this._items[i];
                     if (item.target == null)
@@ -11994,8 +11841,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (this._reversed) {
                         startValue = item.tweenConfig.endValue;
                         endValue = item.tweenConfig.startValue;
-                    }
-                    else {
+                    } else {
                         startValue = item.tweenConfig.startValue;
                         endValue = item.tweenConfig.endValue;
                     }
@@ -12031,8 +11877,7 @@ window.__extends = (this && this.__extends) || (function () {
                         item.tweener.setBreakpoint(this._endTime - time);
                     this._totalTasks++;
                 }
-            }
-            else if (item.type == TransitionActionType.Shake) {
+            } else if (item.type == TransitionActionType.Shake) {
                 if (this._reversed)
                     time = (this._totalDuration - item.time - item.value.duration);
                 else
@@ -12048,8 +11893,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this._endTime >= 0)
                     item.tweener.setBreakpoint(this._endTime - item.time);
                 this._totalTasks++;
-            }
-            else {
+            } else {
                 if (this._reversed)
                     time = (this._totalDuration - item.time);
                 else
@@ -12057,8 +11901,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (time <= this._startTime) {
                     this.applyValue(item);
                     this.callHook(item, false);
-                }
-                else if (this._endTime == -1 || time <= this._endTime) {
+                } else if (this._endTime == -1 || time <= this._endTime) {
                     this._totalTasks++;
                     item.tweener = fgui.GTween.delayedCall(time)
                         .setTimeScale(this._timeScale)
@@ -12101,13 +11944,11 @@ window.__extends = (this && this.__extends) || (function () {
                         else
                             playStartTime = -1;
                         playTotalTime = 0;
-                    }
-                    else {
+                    } else {
                         if (value.playing) {
                             if (playStartTime < 0)
                                 playStartTime = item.time;
-                        }
-                        else {
+                        } else {
                             if (playStartTime >= 0)
                                 playTotalTime += (item.time - playStartTime);
                             playStartTime = -1;
@@ -12133,14 +11974,14 @@ window.__extends = (this && this.__extends) || (function () {
         };
         Transition.prototype.onTweenStart = function (tweener) {
             var item = tweener.target;
-            if (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size) {
+            if (item.type == TransitionActionType.XY || item.type == TransitionActionType.Size) //位置和大小要到start才最终确认起始值
+            {
                 var startValue;
                 var endValue;
                 if (this._reversed) {
                     startValue = item.tweenConfig.endValue;
                     endValue = item.tweenConfig.startValue;
-                }
-                else {
+                } else {
                     startValue = item.tweenConfig.startValue;
                     endValue = item.tweenConfig.endValue;
                 }
@@ -12150,15 +11991,13 @@ window.__extends = (this && this.__extends) || (function () {
                             startValue.f1 = item.target.x;
                         if (!startValue.b2)
                             startValue.f2 = item.target.y;
-                    }
-                    else {
+                    } else {
                         if (!startValue.b1)
                             startValue.f1 = item.target.x - this._ownerBaseX;
                         if (!startValue.b2)
                             startValue.f2 = item.target.y - this._ownerBaseY;
                     }
-                }
-                else {
+                } else {
                     if (!startValue.b1)
                         startValue.f1 = item.target.width;
                     if (!startValue.b2)
@@ -12209,7 +12048,7 @@ window.__extends = (this && this.__extends) || (function () {
             var item = tweener.target;
             item.tweener = null;
             this._totalTasks--;
-            if (tweener.allCompleted)
+            if (tweener.allCompleted) //当整体播放结束时间在这个tween的中间时不应该调用结尾钩子
                 this.callHook(item, true);
             this.checkAllComplete();
         };
@@ -12221,8 +12060,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (tweenEnd) {
                 if (item.tweenConfig != null && item.tweenConfig.endHook != null)
                     item.tweenConfig.endHook(item.label);
-            }
-            else {
+            } else {
                 if (item.time >= this._startTime && item.hook != null)
                     item.hook(item.label);
             }
@@ -12231,8 +12069,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._playing && this._totalTasks == 0) {
                 if (this._totalTimes < 0) {
                     this.internalPlay();
-                }
-                else {
+                } else {
                     this._totalTimes--;
                     if (this._totalTimes > 0)
                         this.internalPlay();
@@ -12270,8 +12107,7 @@ window.__extends = (this && this.__extends) || (function () {
                         else
                             f2 = item.value.f2 + this._ownerBaseY;
                         item.target.setPosition(f1, f2);
-                    }
-                    else {
+                    } else {
                         if (!item.value.b1)
                             item.value.f1 = item.target.x;
                         if (!item.value.b2)
@@ -12323,7 +12159,9 @@ window.__extends = (this && this.__extends) || (function () {
                             if (item.value.stopTime >= 0 && (endTime < 0 || endTime > item.value.stopTime))
                                 endTime = item.value.stopTime;
                             trans.timeScale = this._timeScale;
-                            trans._play(function () { this.onPlayTransCompleted(item); }.bind(this), item.value.playTimes, 0, startTime, endTime, this._reversed);
+                            trans._play(function () {
+                                this.onPlayTransCompleted(item);
+                            }.bind(this), item.value.playTimes, 0, startTime, endTime, this._reversed);
                         }
                     }
                     break;
@@ -12343,11 +12181,10 @@ window.__extends = (this && this.__extends) || (function () {
                     item.value.lastOffsetX = item.value.offsetX;
                     item.value.lastOffsetY = item.value.offsetY;
                     break;
-                case TransitionActionType.ColorFilter:
-                    {
-                        //TODO: filter support
-                        break;
-                    }
+                case TransitionActionType.ColorFilter: {
+                    //TODO: filter support
+                    break;
+                }
                 case TransitionActionType.Text:
                     item.target.text = item.value.text;
                     break;
@@ -12391,8 +12228,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this.decodeValue(item, buffer, item.tweenConfig.startValue);
                     buffer.seek(curPos, 3);
                     this.decodeValue(item, buffer, item.tweenConfig.endValue);
-                }
-                else {
+                } else {
                     if (item.time > this._totalDuration)
                         this._totalDuration = item.time;
                     buffer.seek(curPos, 2);
@@ -12462,8 +12298,7 @@ window.__extends = (this && this.__extends) || (function () {
     }());
     fgui.Transition = Transition;
     var TransitionActionType = /** @class */ (function () {
-        function TransitionActionType() {
-        }
+        function TransitionActionType() {}
         TransitionActionType.XY = 0;
         TransitionActionType.Size = 1;
         TransitionActionType.Scale = 2;
@@ -12533,33 +12368,27 @@ window.__extends = (this && this.__extends) || (function () {
         return TweenConfig;
     }());
     var TValue_Visible = /** @class */ (function () {
-        function TValue_Visible() {
-        }
+        function TValue_Visible() {}
         return TValue_Visible;
     }());
     var TValue_Animation = /** @class */ (function () {
-        function TValue_Animation() {
-        }
+        function TValue_Animation() {}
         return TValue_Animation;
     }());
     var TValue_Sound = /** @class */ (function () {
-        function TValue_Sound() {
-        }
+        function TValue_Sound() {}
         return TValue_Sound;
     }());
     var TValue_Transition = /** @class */ (function () {
-        function TValue_Transition() {
-        }
+        function TValue_Transition() {}
         return TValue_Transition;
     }());
     var TValue_Shake = /** @class */ (function () {
-        function TValue_Shake() {
-        }
+        function TValue_Shake() {}
         return TValue_Shake;
     }());
     var TValue_Text = /** @class */ (function () {
-        function TValue_Text() {
-        }
+        function TValue_Text() {}
         return TValue_Text;
     }());
     var TValue = /** @class */ (function () {
@@ -12573,8 +12402,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var TranslationHelper = /** @class */ (function () {
-        function TranslationHelper() {
-        }
+        function TranslationHelper() {}
         TranslationHelper.loadFromXML = function (source) {
             TranslationHelper.strings = {};
             var xml = new cc["SAXParser"]().parse(source).documentElement;
@@ -12635,7 +12463,8 @@ window.__extends = (this && this.__extends) || (function () {
                 for (j = 0; j < gearCnt; j++) {
                     nextPos = buffer.readShort();
                     nextPos += buffer.position;
-                    if (buffer.readByte() == 6) {
+                    if (buffer.readByte() == 6) //gearText
+                    {
                         buffer.skip(2); //controller
                         valueCnt = buffer.readShort();
                         for (k = 0; k < valueCnt; k++) {
@@ -12655,81 +12484,76 @@ window.__extends = (this && this.__extends) || (function () {
                 switch (type) {
                     case fgui.ObjectType.Text:
                     case fgui.ObjectType.RichText:
-                    case fgui.ObjectType.InputText:
-                        {
-                            if ((value = compStrings[elementId]) != null) {
-                                buffer.seek(curPos, 6);
-                                buffer.writeS(value);
-                            }
-                            if ((value = compStrings[elementId + "-prompt"]) != null) {
-                                buffer.seek(curPos, 4);
-                                buffer.writeS(value);
-                            }
-                            break;
+                    case fgui.ObjectType.InputText: {
+                        if ((value = compStrings[elementId]) != null) {
+                            buffer.seek(curPos, 6);
+                            buffer.writeS(value);
                         }
-                    case fgui.ObjectType.List:
-                        {
-                            buffer.seek(curPos, 8);
+                        if ((value = compStrings[elementId + "-prompt"]) != null) {
+                            buffer.seek(curPos, 4);
+                            buffer.writeS(value);
+                        }
+                        break;
+                    }
+                    case fgui.ObjectType.List: {
+                        buffer.seek(curPos, 8);
+                        buffer.skip(2);
+                        itemCount = buffer.readShort();
+                        for (j = 0; j < itemCount; j++) {
+                            nextPos = buffer.readShort();
+                            nextPos += buffer.position;
+                            buffer.skip(2); //url
+                            if ((value = compStrings[elementId + "-" + j]) != null)
+                                buffer.writeS(value);
+                            else
+                                buffer.skip(2);
+                            if ((value = compStrings[elementId + "-" + j + "-0"]) != null)
+                                buffer.writeS(value);
+                            buffer.position = nextPos;
+                        }
+                        break;
+                    }
+                    case fgui.ObjectType.Label: {
+                        if (buffer.seek(curPos, 6) && buffer.readByte() == type) {
+                            if ((value = compStrings[elementId]) != null)
+                                buffer.writeS(value);
+                            else
+                                buffer.skip(2);
                             buffer.skip(2);
+                            if (buffer.readBool())
+                                buffer.skip(4);
+                            buffer.skip(4);
+                            if (buffer.readBool() && (value = compStrings[elementId + "-prompt"]) != null)
+                                buffer.writeS(value);
+                        }
+                        break;
+                    }
+                    case fgui.ObjectType.Button: {
+                        if (buffer.seek(curPos, 6) && buffer.readByte() == type) {
+                            if ((value = compStrings[elementId]) != null)
+                                buffer.writeS(value);
+                            else
+                                buffer.skip(2);
+                            if ((value = compStrings[elementId + "-0"]) != null)
+                                buffer.writeS(value);
+                        }
+                        break;
+                    }
+                    case fgui.ObjectType.ComboBox: {
+                        if (buffer.seek(curPos, 6) && buffer.readByte() == type) {
                             itemCount = buffer.readShort();
                             for (j = 0; j < itemCount; j++) {
                                 nextPos = buffer.readShort();
                                 nextPos += buffer.position;
-                                buffer.skip(2); //url
                                 if ((value = compStrings[elementId + "-" + j]) != null)
-                                    buffer.writeS(value);
-                                else
-                                    buffer.skip(2);
-                                if ((value = compStrings[elementId + "-" + j + "-0"]) != null)
                                     buffer.writeS(value);
                                 buffer.position = nextPos;
                             }
-                            break;
+                            if ((value = compStrings[elementId]) != null)
+                                buffer.writeS(value);
                         }
-                    case fgui.ObjectType.Label:
-                        {
-                            if (buffer.seek(curPos, 6) && buffer.readByte() == type) {
-                                if ((value = compStrings[elementId]) != null)
-                                    buffer.writeS(value);
-                                else
-                                    buffer.skip(2);
-                                buffer.skip(2);
-                                if (buffer.readBool())
-                                    buffer.skip(4);
-                                buffer.skip(4);
-                                if (buffer.readBool() && (value = compStrings[elementId + "-prompt"]) != null)
-                                    buffer.writeS(value);
-                            }
-                            break;
-                        }
-                    case fgui.ObjectType.Button:
-                        {
-                            if (buffer.seek(curPos, 6) && buffer.readByte() == type) {
-                                if ((value = compStrings[elementId]) != null)
-                                    buffer.writeS(value);
-                                else
-                                    buffer.skip(2);
-                                if ((value = compStrings[elementId + "-0"]) != null)
-                                    buffer.writeS(value);
-                            }
-                            break;
-                        }
-                    case fgui.ObjectType.ComboBox:
-                        {
-                            if (buffer.seek(curPos, 6) && buffer.readByte() == type) {
-                                itemCount = buffer.readShort();
-                                for (j = 0; j < itemCount; j++) {
-                                    nextPos = buffer.readShort();
-                                    nextPos += buffer.position;
-                                    if ((value = compStrings[elementId + "-" + j]) != null)
-                                        buffer.writeS(value);
-                                    buffer.position = nextPos;
-                                }
-                                if ((value = compStrings[elementId]) != null)
-                                    buffer.writeS(value);
-                            }
-                            break;
-                        }
+                        break;
+                    }
                 }
                 buffer.position = curPos + dataLen;
             }
@@ -12742,8 +12566,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var UIConfig = /** @class */ (function () {
-        function UIConfig() {
-        }
+        function UIConfig() {}
         //Default font name
         UIConfig.defaultFont = "Arial";
         //When a modal window is in front, the background becomes dark.
@@ -12781,6 +12604,7 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.UIConfig = UIConfig;
     var _flag = false;
     fgui.addLoadHandler = function (ext) {
+        var _a, _b;
         if (_flag)
             return;
         _flag = true;
@@ -12793,7 +12617,6 @@ window.__extends = (this && this.__extends) || (function () {
                 return item.content;
             },
             _b));
-        var _a, _b;
     };
     var _fontRegistry = {};
     fgui.registerFont = function (name, font) {
@@ -12809,8 +12632,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var UIObjectFactory = /** @class */ (function () {
-        function UIObjectFactory() {
-        }
+        function UIObjectFactory() {}
         //for backward compatiblity
         UIObjectFactory.setPackageItemExtension = function (url, type) {
             UIObjectFactory.setExtension(url, type);
@@ -12953,7 +12775,9 @@ window.__extends = (this && this.__extends) || (function () {
             delete UIPackage._instByName[pkg.name];
         };
         UIPackage.createObject = function (pkgName, resName, userClass) {
-            if (userClass === void 0) { userClass = null; }
+            if (userClass === void 0) {
+                userClass = null;
+            }
             var pkg = UIPackage.getByName(pkgName);
             if (pkg)
                 return pkg.createObject(resName, userClass);
@@ -12961,7 +12785,9 @@ window.__extends = (this && this.__extends) || (function () {
                 return null;
         };
         UIPackage.createObjectFromURL = function (url, userClass) {
-            if (userClass === void 0) { userClass = null; }
+            if (userClass === void 0) {
+                userClass = null;
+            }
             var pi = UIPackage.getItemByURL(url);
             if (pi)
                 return pi.owner.internalCreateObject(pi, userClass);
@@ -12991,8 +12817,7 @@ window.__extends = (this && this.__extends) || (function () {
                         return pkg.getItemById(srcId);
                     }
                 }
-            }
-            else {
+            } else {
                 var pkgName = url.substr(pos1 + 2, pos2 - pos1 - 2);
                 pkg = UIPackage.getByName(pkgName);
                 if (pkg != null) {
@@ -13063,53 +12888,47 @@ window.__extends = (this && this.__extends) || (function () {
                 pi.width = buffer.readInt();
                 pi.height = buffer.readInt();
                 switch (pi.type) {
-                    case fgui.PackageItemType.Image:
-                        {
-                            pi.objectType = fgui.ObjectType.Image;
-                            var scaleOption = buffer.readByte();
-                            if (scaleOption == 1) {
-                                pi.scale9Grid = new cc.Rect();
-                                pi.scale9Grid.x = buffer.readInt();
-                                pi.scale9Grid.y = buffer.readInt();
-                                pi.scale9Grid.width = buffer.readInt();
-                                pi.scale9Grid.height = buffer.readInt();
-                                pi.tileGridIndice = buffer.readInt();
-                            }
-                            else if (scaleOption == 2)
-                                pi.scaleByTile = true;
-                            pi.smoothing = buffer.readBool();
-                            break;
-                        }
-                    case fgui.PackageItemType.MovieClip:
-                        {
-                            pi.smoothing = buffer.readBool();
-                            pi.objectType = fgui.ObjectType.MovieClip;
-                            pi.rawData = buffer.readBuffer();
-                            break;
-                        }
-                    case fgui.PackageItemType.Font:
-                        {
-                            pi.rawData = buffer.readBuffer();
-                            break;
-                        }
-                    case fgui.PackageItemType.Component:
-                        {
-                            var extension = buffer.readByte();
-                            if (extension > 0)
-                                pi.objectType = extension;
-                            else
-                                pi.objectType = fgui.ObjectType.Component;
-                            pi.rawData = buffer.readBuffer();
-                            fgui.UIObjectFactory.resolveExtension(pi);
-                            break;
-                        }
+                    case fgui.PackageItemType.Image: {
+                        pi.objectType = fgui.ObjectType.Image;
+                        var scaleOption = buffer.readByte();
+                        if (scaleOption == 1) {
+                            pi.scale9Grid = new cc.Rect();
+                            pi.scale9Grid.x = buffer.readInt();
+                            pi.scale9Grid.y = buffer.readInt();
+                            pi.scale9Grid.width = buffer.readInt();
+                            pi.scale9Grid.height = buffer.readInt();
+                            pi.tileGridIndice = buffer.readInt();
+                        } else if (scaleOption == 2)
+                            pi.scaleByTile = true;
+                        pi.smoothing = buffer.readBool();
+                        break;
+                    }
+                    case fgui.PackageItemType.MovieClip: {
+                        pi.smoothing = buffer.readBool();
+                        pi.objectType = fgui.ObjectType.MovieClip;
+                        pi.rawData = buffer.readBuffer();
+                        break;
+                    }
+                    case fgui.PackageItemType.Font: {
+                        pi.rawData = buffer.readBuffer();
+                        break;
+                    }
+                    case fgui.PackageItemType.Component: {
+                        var extension = buffer.readByte();
+                        if (extension > 0)
+                            pi.objectType = extension;
+                        else
+                            pi.objectType = fgui.ObjectType.Component;
+                        pi.rawData = buffer.readBuffer();
+                        fgui.UIObjectFactory.resolveExtension(pi);
+                        break;
+                    }
                     case fgui.PackageItemType.Atlas:
                     case fgui.PackageItemType.Sound:
-                    case fgui.PackageItemType.Misc:
-                        {
-                            pi.file = url + cc.path.mainFileName(pi.file);
-                            break;
-                        }
+                    case fgui.PackageItemType.Misc: {
+                        pi.file = url + cc.path.mainFileName(pi.file);
+                        break;
+                    }
                 }
                 this._items.push(pi);
                 this._itemsById[pi.id] = pi;
@@ -13185,7 +13004,9 @@ window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         UIPackage.prototype.createObject = function (resName, userClass) {
-            if (userClass === void 0) { userClass = null; }
+            if (userClass === void 0) {
+                userClass = null;
+            }
             var pi = this._itemsByName[resName];
             if (pi)
                 return this.internalCreateObject(pi, userClass);
@@ -13193,15 +13014,16 @@ window.__extends = (this && this.__extends) || (function () {
                 return null;
         };
         UIPackage.prototype.internalCreateObject = function (item, userClass) {
-            if (userClass === void 0) { userClass = null; }
+            if (userClass === void 0) {
+                userClass = null;
+            }
             var g;
             if (item.type == fgui.PackageItemType.Component) {
                 if (userClass != null)
                     g = new userClass();
                 else
                     g = fgui.UIObjectFactory.newObject(item);
-            }
-            else
+            } else
                 g = fgui.UIObjectFactory.newObject(item);
             if (g == null)
                 return null;
@@ -13382,8 +13204,7 @@ window.__extends = (this && this.__extends) || (function () {
                             mainTexture = sprite.atlas.asset;
                         }
                     }
-                }
-                else {
+                } else {
                     rect.x += mainSprite.rect.x;
                     rect.y += mainSprite.rect.y;
                 }
@@ -13423,6 +13244,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var Window = /** @class */ (function (_super) {
         __extends(Window, _super);
+
         function Window() {
             var _this = _super.call(this) || this;
             _this._requestingCmd = 0;
@@ -13582,12 +13404,13 @@ window.__extends = (this && this.__extends) || (function () {
                 pt = this.globalToLocal(pt.x, pt.y, pt);
                 this._modalWaitPane.setPosition(pt.x + this._contentArea.x, pt.y + this._contentArea.y);
                 this._modalWaitPane.setSize(this._contentArea.width, this._contentArea.height);
-            }
-            else
+            } else
                 this._modalWaitPane.setSize(this.width, this.height);
         };
         Window.prototype.closeModalWait = function (requestingCmd) {
-            if (requestingCmd === void 0) { requestingCmd = 0; }
+            if (requestingCmd === void 0) {
+                requestingCmd = 0;
+            }
             if (requestingCmd != 0) {
                 if (this._requestingCmd != requestingCmd)
                     return false;
@@ -13619,16 +13442,12 @@ window.__extends = (this && this.__extends) || (function () {
                 }
                 if (!this._loading)
                     this._init();
-            }
-            else
+            } else
                 this._init();
         };
-        Window.prototype.onInit = function () {
-        };
-        Window.prototype.onShown = function () {
-        };
-        Window.prototype.onHide = function () {
-        };
+        Window.prototype.onInit = function () {};
+        Window.prototype.onShown = function () {};
+        Window.prototype.onHide = function () {};
         Window.prototype.doShowAnimation = function () {
             this.onShown();
         };
@@ -13687,8 +13506,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var ControllerAction = /** @class */ (function () {
-        function ControllerAction() {
-        }
+        function ControllerAction() {}
         ControllerAction.createAction = function (type) {
             switch (type) {
                 case 0:
@@ -13699,16 +13517,14 @@ window.__extends = (this && this.__extends) || (function () {
             return null;
         };
         ControllerAction.prototype.run = function (controller, prevPage, curPage) {
-            if ((this.fromPage == null || this.fromPage.length == 0 || this.fromPage.indexOf(prevPage) != -1)
-                && (this.toPage == null || this.toPage.length == 0 || this.toPage.indexOf(curPage) != -1))
+            if ((this.fromPage == null || this.fromPage.length == 0 || this.fromPage.indexOf(prevPage) != -1) &&
+                (this.toPage == null || this.toPage.length == 0 || this.toPage.indexOf(curPage) != -1))
                 this.enter(controller);
             else
                 this.leave(controller);
         };
-        ControllerAction.prototype.enter = function (controller) {
-        };
-        ControllerAction.prototype.leave = function (controller) {
-        };
+        ControllerAction.prototype.enter = function (controller) {};
+        ControllerAction.prototype.leave = function (controller) {};
         ControllerAction.prototype.setup = function (buffer) {
             var cnt;
             var i;
@@ -13730,6 +13546,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var ChangePageAction = /** @class */ (function (_super) {
         __extends(ChangePageAction, _super);
+
         function ChangePageAction() {
             return _super.call(this) || this;
         }
@@ -13743,8 +13560,7 @@ window.__extends = (this && this.__extends) || (function () {
                     gcom = obj;
                 else
                     return;
-            }
-            else
+            } else
                 gcom = controller.parent;
             if (gcom) {
                 var cc = gcom.getController(this.controllerName);
@@ -13766,6 +13582,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var PlayTransitionAction = /** @class */ (function (_super) {
         __extends(PlayTransitionAction, _super);
+
         function PlayTransitionAction() {
             var _this = _super.call(this) || this;
             _this.playTimes = 1;
@@ -13818,8 +13635,7 @@ window.__extends = (this && this.__extends) || (function () {
         BlendMode[BlendMode["Custom3"] = 11] = "Custom3";
     })(BlendMode = fgui.BlendMode || (fgui.BlendMode = {}));
     var BlendModeUtils = /** @class */ (function () {
-        function BlendModeUtils() {
-        }
+        function BlendModeUtils() {}
         BlendModeUtils.apply = function (node, blendMode) {
             var renderer = node.getComponent(cc.RenderComponent);
             if (renderer) {
@@ -13854,6 +13670,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var Image = /** @class */ (function (_super) {
         __extends(Image, _super);
+
         function Image() {
             var _this = _super.call(this) || this;
             _this._flip = fgui.FlipType.None;
@@ -13872,7 +13689,8 @@ window.__extends = (this && this.__extends) || (function () {
             set: function (value) {
                 if (this._flip != value) {
                     this._flip = value;
-                    var sx = 1, sy = 1;
+                    var sx = 1,
+                        sy = 1;
                     if (this._flip == fgui.FlipType.Horizontal || this._flip == fgui.FlipType.Both)
                         sx = -1;
                     if (this._flip == fgui.FlipType.Vertical || this._flip == fgui.FlipType.Both)
@@ -13900,8 +13718,7 @@ window.__extends = (this && this.__extends) || (function () {
                             this.fillType = cc.Sprite.FillType.RADIAL;
                         this.fillCenter = new cc.Vec2(0.5, 0.5);
                         this.setupFill();
-                    }
-                    else {
+                    } else {
                         this.type = cc.Sprite.Type.SIMPLE;
                     }
                 }
@@ -13959,10 +13776,9 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._fillMethod == fgui.FillMethod.Horizontal || this._fillMethod == fgui.FillMethod.Vertical) {
                 this._fillClockwise = this._fillOrigin == fgui.FillOrigin.Right || this._fillOrigin == fgui.FillOrigin.Bottom;
                 this.fillStart = this._fillClockwise ? 1 : 0;
-            }
-            else {
-                var origin = this._fillOrigin;
-                switch (origin) {
+            } else {
+                var origin_1 = this._fillOrigin;
+                switch (origin_1) {
                     case fgui.FillOrigin.Right:
                         this.fillOrigin = 0;
                         break;
@@ -13995,6 +13811,7 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.Frame = Frame;
     var MovieClip = /** @class */ (function (_super) {
         __extends(MovieClip, _super);
+
         function MovieClip() {
             var _this = _super.call(this) || this;
             _this.interval = 0;
@@ -14034,8 +13851,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._frameElapsed = 0;
                     this._repeatedCount = 0;
                     this._reversed = false;
-                }
-                else {
+                } else {
                     this._frameCount = 0;
                 }
             },
@@ -14122,8 +13938,7 @@ window.__extends = (this && this.__extends) || (function () {
                             this._repeatedCount++;
                             this._reversed = !this._reversed;
                         }
-                    }
-                    else {
+                    } else {
                         this._frame++;
                         if (this._frame > this._frameCount - 1) {
                             this._frame = Math.max(0, this._frameCount - 2);
@@ -14131,15 +13946,15 @@ window.__extends = (this && this.__extends) || (function () {
                             this._reversed = !this._reversed;
                         }
                     }
-                }
-                else {
+                } else {
                     this._frame++;
                     if (this._frame > this._frameCount - 1) {
                         this._frame = 0;
                         this._repeatedCount++;
                     }
                 }
-                if (this._frame == beginFrame && this._reversed == beginReversed) {
+                if (this._frame == beginFrame && this._reversed == beginReversed) //走了一轮了
+                {
                     var roundTime = backupTime - timeInMiniseconds; //这就是一轮需要的时间
                     timeInMiniseconds -= Math.floor(timeInMiniseconds / roundTime) * roundTime; //跳过
                 }
@@ -14191,8 +14006,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this._repeatedCount++;
                         this._reversed = !this._reversed;
                     }
-                }
-                else {
+                } else {
                     this._frame++;
                     if (this._frame > this._frameCount - 1) {
                         this._frame = Math.max(0, this._frameCount - 2);
@@ -14200,20 +14014,20 @@ window.__extends = (this && this.__extends) || (function () {
                         this._reversed = !this._reversed;
                     }
                 }
-            }
-            else {
+            } else {
                 this._frame++;
                 if (this._frame > this._frameCount - 1) {
                     this._frame = 0;
                     this._repeatedCount++;
                 }
             }
-            if (this._status == 1) {
+            if (this._status == 1) //new loop
+            {
                 this._frame = this._start;
                 this._frameElapsed = 0;
                 this._status = 0;
-            }
-            else if (this._status == 2) {
+            } else if (this._status == 2) //ending
+            {
                 this._frame = this._endAt;
                 this._frameElapsed = 0;
                 this._status = 3; //ended
@@ -14225,8 +14039,7 @@ window.__extends = (this && this.__extends) || (function () {
                     this._callbackObj = null;
                     callback.call(caller);
                 }
-            }
-            else {
+            } else {
                 if (this._frame == this._end) {
                     if (this._times > 0) {
                         this._times--;
@@ -14234,8 +14047,7 @@ window.__extends = (this && this.__extends) || (function () {
                             this._status = 2; //ending
                         else
                             this._status = 1; //new loop
-                    }
-                    else if (this._start != 0)
+                    } else if (this._start != 0)
                         this._status = 1; //new loop
                 }
             }
@@ -14255,6 +14067,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var Event = /** @class */ (function (_super) {
         __extends(Event, _super);
+
         function Event(type, bubbles) {
             var _this = _super.call(this, type, bubbles) || this;
             _this.pos = new cc.Vec2();
@@ -14290,8 +14103,7 @@ window.__extends = (this && this.__extends) || (function () {
                 evt = Event._eventPool.pop();
                 evt.type = type;
                 evt.bubbles = bubbles;
-            }
-            else {
+            } else {
                 evt = new Event(type, bubbles);
             }
             return evt;
@@ -14374,6 +14186,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var InputProcessor = /** @class */ (function (_super) {
         __extends(InputProcessor, _super);
+
         function InputProcessor() {
             var _this = _super.call(this) || this;
             _this._touches = new Array();
@@ -14526,8 +14339,8 @@ window.__extends = (this && this.__extends) || (function () {
             var cnt = ti.touchMonitors.length;
             for (var i = 0; i < cnt; i++) {
                 var mm = ti.touchMonitors[i];
-                if (mm == ti.target || mm.node == null || !mm.node.activeInHierarchy
-                    || (mm instanceof fgui.GComponent) && mm.isAncestorOf(ti.target))
+                if (mm == ti.target || mm.node == null || !mm.node.activeInHierarchy ||
+                    (mm instanceof fgui.GComponent) && mm.isAncestorOf(ti.target))
                     continue;
                 evt2.unuse();
                 evt2.type = fgui.Event.TOUCH_END;
@@ -14549,7 +14362,7 @@ window.__extends = (this && this.__extends) || (function () {
                 ti.target.node.dispatchEvent(evt2);
                 fgui.Event._return(evt2);
             }
-            if (cc.sys.isMobile)
+            if (cc.sys.isMobile) //on mobile platform, trigger RollOut on up event, but not on PC
                 this.handleRollOver(ti, null);
             else
                 this.handleRollOver(ti, ti.target);
@@ -14563,8 +14376,8 @@ window.__extends = (this && this.__extends) || (function () {
             var cnt = ti.touchMonitors.length;
             for (var i = 0; i < cnt; i++) {
                 var mm = ti.touchMonitors[i];
-                if (mm == ti.target || mm.node == null || !mm.node.activeInHierarchy
-                    || (mm instanceof fgui.GComponent) && mm.isAncestorOf(ti.target))
+                if (mm == ti.target || mm.node == null || !mm.node.activeInHierarchy ||
+                    (mm instanceof fgui.GComponent) && mm.isAncestorOf(ti.target))
                     continue;
                 evt2.initiator = mm;
                 mm.node.dispatchEvent(evt2);
@@ -14590,9 +14403,9 @@ window.__extends = (this && this.__extends) || (function () {
         };
         InputProcessor.prototype.mouseMoveHandler = function (evt) {
             var ti = this.getInfo(0, false);
-            if (ti
-                && Math.abs(ti.pos.x - evt.getLocationX()) < 1
-                && Math.abs(ti.pos.y - (fgui.GRoot.inst.height - evt.getLocationY())) < 1)
+            if (ti &&
+                Math.abs(ti.pos.x - evt.getLocationX()) < 1 &&
+                Math.abs(ti.pos.y - (fgui.GRoot.inst.height - evt.getLocationY())) < 1)
                 return;
             ti = this.updateInfo(0, evt.getLocation());
             this.handleRollOver(ti, ti.target);
@@ -14682,15 +14495,14 @@ window.__extends = (this && this.__extends) || (function () {
                     ti.clickCount = 1;
                 else
                     ti.clickCount++;
-            }
-            else
+            } else
                 ti.clickCount = 1;
             ti.lastClickTime = now;
         };
         InputProcessor.prototype.clickTest = function (ti) {
-            if (ti.downTargets.length == 0
-                || ti.clickCancelled
-                || Math.abs(ti.pos.x - ti.downPos.x) > 50 || Math.abs(ti.pos.y - ti.downPos.y) > 50)
+            if (ti.downTargets.length == 0 ||
+                ti.clickCancelled ||
+                Math.abs(ti.pos.x - ti.downPos.x) > 50 || Math.abs(ti.pos.y - ti.downPos.y) > 50)
                 return null;
             var obj = ti.downTargets[0];
             if (obj && obj.node != null && obj.node.activeInHierarchy)
@@ -14774,8 +14586,7 @@ window.__extends = (this && this.__extends) || (function () {
             this.touchMonitors = new Array();
         }
         return TouchInfo;
-    }());
-    ;
+    }());;
 })(fgui || (fgui = {}));
 
 (function (fgui) {
@@ -14818,8 +14629,7 @@ window.__extends = (this && this.__extends) || (function () {
                 for (i = 0; i < cnt; i++)
                     pages[i] = buffer.readS();
                 this.pages = pages;
-            }
-            else {
+            } else {
                 cnt = buffer.readShort();
                 for (i = 0; i < cnt; i++) {
                     page = buffer.readS();
@@ -14837,16 +14647,11 @@ window.__extends = (this && this.__extends) || (function () {
                 this._tweenConfig.delay = buffer.readFloat();
             }
         };
-        GearBase.prototype.updateFromRelations = function (dx, dy) {
-        };
-        GearBase.prototype.addStatus = function (pageId, buffer) {
-        };
-        GearBase.prototype.init = function () {
-        };
-        GearBase.prototype.apply = function () {
-        };
-        GearBase.prototype.updateState = function () {
-        };
+        GearBase.prototype.updateFromRelations = function (dx, dy) {};
+        GearBase.prototype.addStatus = function (pageId, buffer) {};
+        GearBase.prototype.init = function () {};
+        GearBase.prototype.apply = function () {};
+        GearBase.prototype.updateState = function () {};
         GearBase.disableAllTweenEffect = false;
         return GearBase;
     }());
@@ -14867,6 +14672,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearAnimation = /** @class */ (function (_super) {
         __extends(GearAnimation, _super);
+
         function GearAnimation(owner) {
             return _super.call(this, owner) || this;
         }
@@ -14908,8 +14714,12 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.GearAnimation = GearAnimation;
     var GearAnimationValue = /** @class */ (function () {
         function GearAnimationValue(playing, frame) {
-            if (playing === void 0) { playing = true; }
-            if (frame === void 0) { frame = 0; }
+            if (playing === void 0) {
+                playing = true;
+            }
+            if (frame === void 0) {
+                frame = 0;
+            }
             this.playing = playing;
             this.frame = frame;
         }
@@ -14920,6 +14730,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearColor = /** @class */ (function (_super) {
         __extends(GearColor, _super);
+
         function GearColor(owner) {
             return _super.call(this, owner) || this;
         }
@@ -14966,8 +14777,12 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.GearColor = GearColor;
     var GearColorValue = /** @class */ (function () {
         function GearColorValue(color, strokeColor) {
-            if (color === void 0) { color = cc.Color.TRANSPARENT; }
-            if (strokeColor === void 0) { strokeColor = cc.Color.TRANSPARENT; }
+            if (color === void 0) {
+                color = cc.Color.TRANSPARENT;
+            }
+            if (strokeColor === void 0) {
+                strokeColor = cc.Color.TRANSPARENT;
+            }
             this.color = color;
             this.strokeColor = strokeColor;
         }
@@ -14978,6 +14793,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearDisplay = /** @class */ (function (_super) {
         __extends(GearDisplay, _super);
+
         function GearDisplay(owner) {
             var _this = _super.call(this, owner) || this;
             _this._displayLockToken = 1;
@@ -14991,8 +14807,8 @@ window.__extends = (this && this.__extends) || (function () {
             this._displayLockToken++;
             if (this._displayLockToken == 0)
                 this._displayLockToken = 1;
-            if (this.pages == null || this.pages.length == 0
-                || this.pages.indexOf(this._controller.selectedPageId) != -1)
+            if (this.pages == null || this.pages.length == 0 ||
+                this.pages.indexOf(this._controller.selectedPageId) != -1)
                 this._visible = 1;
             else
                 this._visible = 0;
@@ -15020,6 +14836,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearIcon = /** @class */ (function (_super) {
         __extends(GearIcon, _super);
+
         function GearIcon(owner) {
             return _super.call(this, owner) || this;
         }
@@ -15053,6 +14870,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearLook = /** @class */ (function (_super) {
         __extends(GearLook, _super);
+
         function GearLook(owner) {
             return _super.call(this, owner) || this;
         }
@@ -15086,8 +14904,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (this._tweenConfig._tweener.endValue.x != gv.alpha || this._tweenConfig._tweener.endValue.y != gv.rotation) {
                         this._tweenConfig._tweener.kill(true);
                         this._tweenConfig._tweener = null;
-                    }
-                    else
+                    } else
                         return;
                 }
                 var a = gv.alpha != this._owner.alpha;
@@ -15103,8 +14920,7 @@ window.__extends = (this && this.__extends) || (function () {
                         .onUpdate(this.__tweenUpdate, this)
                         .onComplete(this.__tweenComplete, this);
                 }
-            }
-            else {
+            } else {
                 this._owner._gearLocked = true;
                 this._owner.grayed = gv.grayed;
                 this._owner.touchable = gv.touchable;
@@ -15145,10 +14961,18 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.GearLook = GearLook;
     var GearLookValue = /** @class */ (function () {
         function GearLookValue(alpha, rotation, grayed, touchable) {
-            if (alpha === void 0) { alpha = 0; }
-            if (rotation === void 0) { rotation = 0; }
-            if (grayed === void 0) { grayed = false; }
-            if (touchable === void 0) { touchable = true; }
+            if (alpha === void 0) {
+                alpha = 0;
+            }
+            if (rotation === void 0) {
+                rotation = 0;
+            }
+            if (grayed === void 0) {
+                grayed = false;
+            }
+            if (touchable === void 0) {
+                touchable = true;
+            }
             this.alpha = alpha;
             this.rotation = rotation;
             this.grayed = grayed;
@@ -15161,6 +14985,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearSize = /** @class */ (function (_super) {
         __extends(GearSize, _super);
+
         function GearSize(owner) {
             return _super.call(this, owner) || this;
         }
@@ -15187,12 +15012,11 @@ window.__extends = (this && this.__extends) || (function () {
                 gv = this._default;
             if (this._tweenConfig && this._tweenConfig.tween && !fgui.UIPackage._constructing && !fgui.GearBase.disableAllTweenEffect) {
                 if (this._tweenConfig._tweener != null) {
-                    if (this._tweenConfig._tweener.endValue.x != gv.width || this._tweenConfig._tweener.endValue.y != gv.height
-                        || this._tweenConfig._tweener.endValue.z != gv.scaleX || this._tweenConfig._tweener.endValue.w != gv.scaleY) {
+                    if (this._tweenConfig._tweener.endValue.x != gv.width || this._tweenConfig._tweener.endValue.y != gv.height ||
+                        this._tweenConfig._tweener.endValue.z != gv.scaleX || this._tweenConfig._tweener.endValue.w != gv.scaleY) {
                         this._tweenConfig._tweener.kill(true);
                         this._tweenConfig._tweener = null;
-                    }
-                    else
+                    } else
                         return;
                 }
                 var a = gv.width != this._owner.width || gv.height != this._owner.height;
@@ -15208,8 +15032,7 @@ window.__extends = (this && this.__extends) || (function () {
                         .onUpdate(this.__tweenUpdate, this)
                         .onComplete(this.__tweenComplete, this);
                 }
-            }
-            else {
+            } else {
                 this._owner._gearLocked = true;
                 this._owner.setSize(gv.width, gv.height, this._owner.gearXY.controller == this._controller);
                 this._owner.setScale(gv.scaleX, gv.scaleY);
@@ -15260,10 +15083,18 @@ window.__extends = (this && this.__extends) || (function () {
     fgui.GearSize = GearSize;
     var GearSizeValue = /** @class */ (function () {
         function GearSizeValue(width, height, scaleX, scaleY) {
-            if (width === void 0) { width = 0; }
-            if (height === void 0) { height = 0; }
-            if (scaleX === void 0) { scaleX = 0; }
-            if (scaleY === void 0) { scaleY = 0; }
+            if (width === void 0) {
+                width = 0;
+            }
+            if (height === void 0) {
+                height = 0;
+            }
+            if (scaleX === void 0) {
+                scaleX = 0;
+            }
+            if (scaleY === void 0) {
+                scaleY = 0;
+            }
             this.width = width;
             this.height = height;
             this.scaleX = scaleX;
@@ -15276,6 +15107,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearText = /** @class */ (function (_super) {
         __extends(GearText, _super);
+
         function GearText(owner) {
             return _super.call(this, owner) || this;
         }
@@ -15309,6 +15141,7 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var GearXY = /** @class */ (function (_super) {
         __extends(GearXY, _super);
+
         function GearXY(owner) {
             return _super.call(this, owner) || this;
         }
@@ -15336,8 +15169,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (this._tweenConfig._tweener.endValue.x != pt.x || this._tweenConfig._tweener.endValue.y != pt.y) {
                         this._tweenConfig._tweener.kill(true);
                         this._tweenConfig._tweener = null;
-                    }
-                    else
+                    } else
                         return;
                 }
                 if (this._owner.x != pt.x || this._owner.y != pt.y) {
@@ -15350,8 +15182,7 @@ window.__extends = (this && this.__extends) || (function () {
                         .onUpdate(this.__tweenUpdate, this)
                         .onComplete(this.__tweenComplete, this);
                 }
-            }
-            else {
+            } else {
                 this._owner._gearLocked = true;
                 this._owner.setPosition(pt.x, pt.y);
                 this._owner._gearLocked = false;
@@ -15487,8 +15318,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (index >= 0 && index <= numChildren) {
                 if (child._parent == this) {
                     this.setChildIndex(child, index);
-                }
-                else {
+                } else {
                     if (child._parent)
                         child._parent.removeChild(child);
                     var cnt = this._children.length;
@@ -15503,8 +15333,7 @@ window.__extends = (this && this.__extends) || (function () {
                         this._tree._afterInserted(child);
                 }
                 return child;
-            }
-            else {
+            } else {
                 throw new Error("Invalid child index");
             }
         };
@@ -15525,14 +15354,17 @@ window.__extends = (this && this.__extends) || (function () {
                     this._tree._afterRemoved(child);
                 }
                 return child;
-            }
-            else {
+            } else {
                 throw new Error("Invalid child index");
             }
         };
         TreeNode.prototype.removeChildren = function (beginIndex, endIndex) {
-            if (beginIndex === void 0) { beginIndex = 0; }
-            if (endIndex === void 0) { endIndex = -1; }
+            if (beginIndex === void 0) {
+                beginIndex = 0;
+            }
+            if (endIndex === void 0) {
+                endIndex = -1;
+            }
             if (endIndex < 0 || endIndex >= this.numChildren)
                 endIndex = this.numChildren - 1;
             for (var i = beginIndex; i <= endIndex; ++i)
@@ -15635,8 +15467,7 @@ window.__extends = (this && this.__extends) || (function () {
             this._root._setCell(this._list);
             this._root.expanded = true;
             this._indent = 15;
-        }
-        ;
+        };
         Object.defineProperty(TreeView.prototype, "list", {
             get: function () {
                 return this._list;
@@ -15749,8 +15580,7 @@ window.__extends = (this && this.__extends) || (function () {
                     expandButton.onClick(this.onClickExpandButton, this);
                     expandButton.data = node;
                     expandButton.selected = node.expanded;
-                }
-                else
+                } else
                     expandButton.visible = false;
             }
             if (this.treeNodeRender)
@@ -15875,8 +15705,7 @@ window.__extends = (this && this.__extends) || (function () {
                     node.expanded = false;
                 this._list.scrollPane.posY = posY;
                 this._list.scrollPane.scrollToView(node.cell);
-            }
-            else {
+            } else {
                 if (expandButton.selected)
                     node.expanded = true;
                 else
@@ -15902,10 +15731,10 @@ window.__extends = (this && this.__extends) || (function () {
 })(fgui || (fgui = {}));
 // Author: Daniele Giardini - http://www.demigiant.com
 // Created: 2014/07/19 14:11
-// 
+//
 // License Copyright (c) Daniele Giardini.
 // This work is subject to the terms at http://dotween.demigiant.com/license.php
-// 
+//
 // =============================================================
 // Contains Daniele Giardini's C# port of the easing equations created by Robert Penner
 // (all easing equations except for Flash, InFlash, OutFlash, InOutFlash,
@@ -15940,8 +15769,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var EaseManager = /** @class */ (function () {
-        function EaseManager() {
-        }
+        function EaseManager() {}
         EaseManager.evaluate = function (easeType, time, duration, overshootOrAmplitude, period) {
             switch (easeType) {
                 case fgui.EaseType.Linear:
@@ -16017,8 +15845,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (overshootOrAmplitude < 1) {
                         overshootOrAmplitude = 1;
                         s0 = period / 4;
-                    }
-                    else
+                    } else
                         s0 = period / EaseManager._TwoPi * Math.asin(1 / overshootOrAmplitude);
                     return -(overshootOrAmplitude * Math.pow(2, 10 * (time -= 1)) * Math.sin((time * duration - s0) * EaseManager._TwoPi / period));
                 case fgui.EaseType.ElasticOut:
@@ -16032,8 +15859,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (overshootOrAmplitude < 1) {
                         overshootOrAmplitude = 1;
                         s1 = period / 4;
-                    }
-                    else
+                    } else
                         s1 = period / EaseManager._TwoPi * Math.asin(1 / overshootOrAmplitude);
                     return (overshootOrAmplitude * Math.pow(2, -10 * time) * Math.sin((time * duration - s1) * EaseManager._TwoPi / period) + 1);
                 case fgui.EaseType.ElasticInOut:
@@ -16047,8 +15873,7 @@ window.__extends = (this && this.__extends) || (function () {
                     if (overshootOrAmplitude < 1) {
                         overshootOrAmplitude = 1;
                         s = period / 4;
-                    }
-                    else
+                    } else
                         s = period / EaseManager._TwoPi * Math.asin(1 / overshootOrAmplitude);
                     if (time < 1)
                         return -0.5 * (overshootOrAmplitude * Math.pow(2, 10 * (time -= 1)) * Math.sin((time * duration - s) * EaseManager._TwoPi / period));
@@ -16077,8 +15902,7 @@ window.__extends = (this && this.__extends) || (function () {
     }());
     fgui.EaseManager = EaseManager;
     var Bounce = /** @class */ (function () {
-        function Bounce() {
-        }
+        function Bounce() {}
         Bounce.easeIn = function (time, duration) {
             return 1 - Bounce.easeOut(duration - time, duration);
         };
@@ -16106,8 +15930,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var EaseType = /** @class */ (function () {
-        function EaseType() {
-        }
+        function EaseType() {}
         EaseType.Linear = 0;
         EaseType.SineIn = 1;
         EaseType.SineOut = 2;
@@ -16147,8 +15970,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var GTween = /** @class */ (function () {
-        function GTween() {
-        }
+        function GTween() {}
         GTween.to = function (start, end, duration) {
             return fgui.TweenManager.createTween()._to(start, end, duration);
         };
@@ -16470,7 +16292,8 @@ window.__extends = (this && this.__extends) || (function () {
                 dt *= this._timeScale;
             if (dt == 0)
                 return;
-            if (this._ended != 0) {
+            if (this._ended != 0) //Maybe completed by seek
+            {
                 this.callCompleteCallback();
                 this._killed = true;
                 return;
@@ -16486,7 +16309,8 @@ window.__extends = (this && this.__extends) || (function () {
         };
         GTweener.prototype.update = function () {
             this._ended = 0;
-            if (this._valueSize == 0) {
+            if (this._valueSize == 0) //DelayedCall
+            {
                 if (this._elapsedTime >= this._delay + this._duration)
                     this._ended = 1;
                 return;
@@ -16516,8 +16340,7 @@ window.__extends = (this && this.__extends) || (function () {
                     tt = this._duration;
                     this._ended = 1;
                 }
-            }
-            else if (tt >= this._duration) {
+            } else if (tt >= this._duration) {
                 tt = this._duration;
                 this._ended = 1;
             }
@@ -16533,13 +16356,11 @@ window.__extends = (this && this.__extends) || (function () {
                     this._deltaValue.y = ry;
                     this._value.x = this._startValue.x + rx;
                     this._value.y = this._startValue.y + ry;
-                }
-                else {
+                } else {
                     this._value.x = this._startValue.x;
                     this._value.y = this._startValue.y;
                 }
-            }
-            else {
+            } else {
                 for (var i = 0; i < this._valueSize; i++) {
                     var n1 = this._startValue.getField(i);
                     var n2 = this._endValue.getField(i);
@@ -16572,8 +16393,7 @@ window.__extends = (this && this.__extends) || (function () {
                             this._propType.call(this._target, this._value.x, this._value.y);
                             break;
                     }
-                }
-                else {
+                } else {
                     if (this._valueSize == 5)
                         this._target[this._propType] = this._value.color;
                     else
@@ -16586,8 +16406,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._onStart != null) {
                 try {
                     this._onStart.call(this._onStartCaller, this);
-                }
-                catch (err) {
+                } catch (err) {
                     console.log("FairyGUI: error in start callback > " + err);
                 }
             }
@@ -16596,8 +16415,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._onUpdate != null) {
                 try {
                     this._onUpdate.call(this._onUpdateCaller, this);
-                }
-                catch (err) {
+                } catch (err) {
                     console.log("FairyGUI: error in update callback > " + err);
                 }
             }
@@ -16606,8 +16424,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (this._onComplete != null) {
                 try {
                     this._onComplete.call(this._onCompleteCaller, this);
-                }
-                catch (err) {
+                } catch (err) {
                     console.log("FairyGUI: error in complete callback > " + err);
                 }
             }
@@ -16619,8 +16436,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var TweenManager = /** @class */ (function () {
-        function TweenManager() {
-        }
+        function TweenManager() {}
         TweenManager.createTween = function () {
             if (!TweenManager._root) {
                 TweenManager._root = new cc.Node("[TweenManager]");
@@ -16631,8 +16447,7 @@ window.__extends = (this && this.__extends) || (function () {
             var cnt = TweenManager._tweenerPool.length;
             if (cnt > 0) {
                 tweener = TweenManager._tweenerPool.pop();
-            }
-            else
+            } else
                 tweener = new fgui.GTweener();
             tweener._init();
             TweenManager._activeTweens[TweenManager._totalActiveTweens++] = tweener;
@@ -16646,8 +16461,8 @@ window.__extends = (this && this.__extends) || (function () {
             var anyType = propType == null || propType == undefined;
             for (var i = 0; i < TweenManager._totalActiveTweens; i++) {
                 var tweener = TweenManager._activeTweens[i];
-                if (tweener != null && tweener.target == target && !tweener._killed
-                    && (anyType || tweener._propType == propType))
+                if (tweener != null && tweener.target == target && !tweener._killed &&
+                    (anyType || tweener._propType == propType))
                     return true;
             }
             return false;
@@ -16660,8 +16475,8 @@ window.__extends = (this && this.__extends) || (function () {
             var anyType = propType == null || propType == undefined;
             for (var i = 0; i < cnt; i++) {
                 var tweener = TweenManager._activeTweens[i];
-                if (tweener != null && tweener.target == target && !tweener._killed
-                    && (anyType || tweener._propType == propType)) {
+                if (tweener != null && tweener.target == target && !tweener._killed &&
+                    (anyType || tweener._propType == propType)) {
                     tweener.kill(completed);
                     flag = true;
                 }
@@ -16675,8 +16490,8 @@ window.__extends = (this && this.__extends) || (function () {
             var anyType = propType == null || propType == undefined;
             for (var i = 0; i < cnt; i++) {
                 var tweener = TweenManager._activeTweens[i];
-                if (tweener != null && tweener.target == target && !tweener._killed
-                    && (anyType || tweener._propType == propType)) {
+                if (tweener != null && tweener.target == target && !tweener._killed &&
+                    (anyType || tweener._propType == propType)) {
                     return tweener;
                 }
             }
@@ -16691,15 +16506,13 @@ window.__extends = (this && this.__extends) || (function () {
                 if (tweener == null) {
                     if (freePosStart == -1)
                         freePosStart = i;
-                }
-                else if (tweener._killed) {
+                } else if (tweener._killed) {
                     tweener._reset();
                     TweenManager._tweenerPool.push(tweener);
                     tweens[i] = null;
                     if (freePosStart == -1)
                         freePosStart = i;
-                }
-                else {
+                } else {
                     if (!tweener._paused)
                         tweener._update(dt);
                     if (freePosStart != -1) {
@@ -16710,7 +16523,8 @@ window.__extends = (this && this.__extends) || (function () {
                 }
             }
             if (freePosStart >= 0) {
-                if (TweenManager._totalActiveTweens != cnt) {
+                if (TweenManager._totalActiveTweens != cnt) //new tweens added
+                {
                     var j = cnt;
                     cnt = TweenManager._totalActiveTweens - cnt;
                     for (i = 0; i < cnt; i++)
@@ -16789,8 +16603,12 @@ window.__extends = (this && this.__extends) || (function () {
 (function (fgui) {
     var ByteBuffer = /** @class */ (function () {
         function ByteBuffer(buffer, offset, length) {
-            if (offset === void 0) { offset = 0; }
-            if (length === void 0) { length = -1; }
+            if (offset === void 0) {
+                offset = 0;
+            }
+            if (length === void 0) {
+                length = -1;
+            }
             this.stringTable = null;
             this.version = 0;
             this.littleEndian = false;
@@ -16871,8 +16689,14 @@ window.__extends = (this && this.__extends) || (function () {
             if (len == undefined)
                 len = this.readUshort();
             this.validate(len);
-            var v = "", max = this._pos + len, c = 0, c2 = 0, c3 = 0, f = String.fromCharCode;
-            var u = this._bytes, i = 0;
+            var v = "",
+                max = this._pos + len,
+                c = 0,
+                c2 = 0,
+                c3 = 0,
+                f = String.fromCharCode;
+            var u = this._bytes,
+                i = 0;
             var pos = this._pos;
             while (pos < max) {
                 c = u[pos++];
@@ -16880,15 +16704,12 @@ window.__extends = (this && this.__extends) || (function () {
                     if (c != 0) {
                         v += f(c);
                     }
-                }
-                else if (c < 0xE0) {
+                } else if (c < 0xE0) {
                     v += f(((c & 0x3F) << 6) | (u[pos++] & 0x7F));
-                }
-                else if (c < 0xF0) {
+                } else if (c < 0xF0) {
                     c2 = u[pos++];
                     v += f(((c & 0x1F) << 12) | ((c2 & 0x7F) << 6) | (u[pos++] & 0x7F));
-                }
-                else {
+                } else {
                     c2 = u[pos++];
                     c3 = u[pos++];
                     v += f(((c & 0x0F) << 18) | ((c2 & 0x7F) << 12) | ((c3 << 6) & 0x7F) | (u[pos++] & 0x7F));
@@ -16900,7 +16721,7 @@ window.__extends = (this && this.__extends) || (function () {
         };
         ByteBuffer.prototype.readS = function () {
             var index = this.readUshort();
-            if (index == 65534)
+            if (index == 65534) //null
                 return null;
             else if (index == 65533)
                 return "";
@@ -16942,21 +16763,18 @@ window.__extends = (this && this.__extends) || (function () {
                 if (useShort) {
                     this._pos += 2 * blockIndex;
                     newPos = this.readUshort();
-                }
-                else {
+                } else {
                     this._pos += 4 * blockIndex;
                     newPos = this.readUint();
                 }
                 if (newPos > 0) {
                     this._pos = indexTablePos + newPos;
                     return true;
-                }
-                else {
+                } else {
                     this._pos = tmp;
                     return false;
                 }
-            }
-            else {
+            } else {
                 this._pos = tmp;
                 return false;
             }
@@ -16987,7 +16805,8 @@ window.__extends = (this && this.__extends) || (function () {
             this.multiplyMatrix([-1, 0, 0, 0, 255,
                 0, -1, 0, 0, 255,
                 0, 0, -1, 0, 255,
-                0, 0, 0, 1, 0]);
+                0, 0, 0, 1, 0
+            ]);
         };
         ColorMatrix.prototype.adjustColor = function (p_brightness, p_contrast, p_saturation, p_hue) {
             this.adjustHue(p_hue);
@@ -17122,8 +16941,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (this.linkColor)
                     ret += "<color=" + this.linkColor + ">";
                 return ret;
-            }
-            else {
+            } else {
                 var ret = "";
                 if (this.linkColor)
                     ret += "</color>";
@@ -17139,8 +16957,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (!src)
                     return null;
                 return "<img src=\"" + src + "\"/>";
-            }
-            else
+            } else
                 return null;
         };
         UBBParser.prototype.onTag_Simple = function (tagName, end, attr) {
@@ -17150,8 +16967,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (!end) {
                 this.lastColor = attr;
                 return "<color=" + attr + ">";
-            }
-            else
+            } else
                 return "</color>";
         };
         UBBParser.prototype.onTag_FONT = function (tagName, end, attr) {
@@ -17164,8 +16980,7 @@ window.__extends = (this && this.__extends) || (function () {
             if (!end) {
                 this.lastSize = attr;
                 return "<size=" + attr + ">";
-            }
-            else
+            } else
                 return "</size>";
         };
         UBBParser.prototype.getTagText = function (remove) {
@@ -17173,12 +16988,12 @@ window.__extends = (this && this.__extends) || (function () {
             var pos2;
             var result = "";
             while ((pos2 = this._text.indexOf("[", pos1)) != -1) {
-                if (this._text.charCodeAt(pos2 - 1) == 92) {
+                if (this._text.charCodeAt(pos2 - 1) == 92) //\
+                {
                     result += this._text.substring(pos1, pos2 - 1);
                     result += "[";
                     pos1 = pos2 + 1;
-                }
-                else {
+                } else {
                     result += this._text.substring(pos1, pos2);
                     break;
                 }
@@ -17193,14 +17008,16 @@ window.__extends = (this && this.__extends) || (function () {
             this._text = text;
             this.lastColor = null;
             this.lastSize = null;
-            var pos1 = 0, pos2, pos3;
+            var pos1 = 0,
+                pos2, pos3;
             var end;
             var tag, attr;
             var repl;
             var func;
             var result = "";
             while ((pos2 = this._text.indexOf("[", pos1)) != -1) {
-                if (pos2 > 0 && this._text.charCodeAt(pos2 - 1) == 92) {
+                if (pos2 > 0 && this._text.charCodeAt(pos2 - 1) == 92) //\
+                {
                     result += this._text.substring(pos1, pos2 - 1);
                     result += "[";
                     pos1 = pos2 + 1;
@@ -17227,8 +17044,7 @@ window.__extends = (this && this.__extends) || (function () {
                     repl = func.call(this, tag, end, attr);
                     if (repl != null && !remove)
                         result += repl;
-                }
-                else
+                } else
                     result += this._text.substring(pos1, this._readPos);
                 pos1 = this._readPos;
             }
@@ -17246,8 +17062,7 @@ window.__extends = (this && this.__extends) || (function () {
 
 (function (fgui) {
     var ToolSet = /** @class */ (function () {
-        function ToolSet() {
-        }
+        function ToolSet() {}
         ToolSet.startsWith = function (source, str, ignoreCase) {
             if (!source)
                 return false;

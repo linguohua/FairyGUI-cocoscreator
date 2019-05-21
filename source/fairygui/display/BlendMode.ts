@@ -35,8 +35,8 @@ namespace fgui {
             let renderer = node.getComponent(cc.RenderComponent);
             if (renderer) {
                 let f = BlendModeUtils.factors[<number>blendMode];
-                renderer.srcBlendFactor = f[0];
-                renderer.dstBlendFactor = f[1];
+                (<any>renderer).srcBlendFactor = f[0];
+                (<any>renderer).dstBlendFactor = f[1];
             }
         }
 

@@ -340,7 +340,7 @@ namespace fgui {
                 let font = getFontByName(<string>value);
                 if (!font) {
                     this._label.fontFamily = <string>value;
-                    this._label.isSystemFontUsed = true;
+                    this._label.useSystemFont = true;
                 }
                 else
                     this._label.font = font;
