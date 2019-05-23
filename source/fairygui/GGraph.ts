@@ -18,8 +18,6 @@ namespace fgui {
             this._lineColor = cc.Color.BLACK;
             this._fillColor = cc.Color.WHITE;
             this._cornerRadius = null;
-
-            this._content = this._node.addComponent(cc.Graphics);
         }
 
         public drawRect(lineSize: number, lineColor: cc.Color, fillColor: cc.Color, corner?: Array<number>): void {
@@ -60,6 +58,10 @@ namespace fgui {
         }
 
         private drawCommon(): void {
+            if (!this._content) {
+                this._content = this._node.addComponent(cc.Graphics);
+            }
+
             let ctx = this._content;
             ctx.clear();
 
