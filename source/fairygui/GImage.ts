@@ -78,11 +78,19 @@ namespace fgui {
             else if (this.packageItem.scaleByTile)
                 this._content.type = cc.Sprite.Type.TILED;
             this._content.spriteFrame = <cc.SpriteFrame>this.packageItem.asset;
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            if (this._grayed) {
+                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-gray-sprite'));
+            } else {
+                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-sprite'));
+            }
         }
 
         protected handleGrayedChanged(): void {
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            if (this._grayed) {
+                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-gray-sprite'));
+            } else {
+                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-sprite'));
+            }
         }
 
         public setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void {

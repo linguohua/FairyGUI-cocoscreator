@@ -1,5 +1,5 @@
-Window.fgui = {}
-Window.__extends = (this && this.__extends) || (function () {
+window.fgui = {}
+window.__extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({
@@ -3823,7 +3823,6 @@ Window.__extends = (this && this.__extends) || (function () {
             _this._lineColor = cc.Color.BLACK;
             _this._fillColor = cc.Color.WHITE;
             _this._cornerRadius = null;
-            _this._content = _this._node.addComponent(cc.Graphics);
             return _this;
         }
         GGraph.prototype.drawRect = function (lineSize, lineColor, fillColor, corner) {
@@ -3866,6 +3865,9 @@ Window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         GGraph.prototype.drawCommon = function () {
+            if (!this._content) {
+                this._content = this._node.addComponent(cc.Graphics);
+            }
             var ctx = this._content;
             ctx.clear();
             var w = this._width;
@@ -4350,10 +4352,18 @@ Window.__extends = (this && this.__extends) || (function () {
             else if (this.packageItem.scaleByTile)
                 this._content.type = cc.Sprite.Type.TILED;
             this._content.spriteFrame = this.packageItem.asset;
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            if (this._grayed) {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-gray-sprite'));
+            } else {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-sprite'));
+            }
         };
         GImage.prototype.handleGrayedChanged = function () {
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            if (this._grayed) {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-gray-sprite'));
+            } else {
+                (this._content).setMaterial(0, cc.Material.getBuiltinMaterial('2d-sprite'));
+            }
         };
         GImage.prototype.setup_beforeAdd = function (buffer, beginPos) {
             _super.prototype.setup_beforeAdd.call(this, buffer, beginPos);
