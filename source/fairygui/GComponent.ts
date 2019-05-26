@@ -1196,6 +1196,53 @@ namespace fgui {
         }
 
         protected onConstruct(): void {
+            if (this.baseUserData === "textfield_fold") {
+                this.foldTextFields();
+            }
+        }
+
+        protected foldTextFields(): void {
+            const textFields: GTextField[] = [];
+            this.visit(this, (v: GObject) => {
+                const tf = v.asTextField;
+                if (tf) {
+                    textFields.push(tf);
+                }
+            });
+
+            if (textFields.length > 0) {
+                const tfParent = new cc.Node("tfParent");
+                this.node.addChild(tfParent);
+
+                textFields.forEach((tf) => {
+                    // if cacheMode set to 2 (CacheMode.CHAR)，then
+                    // all character texture will be render to a global 2048*2048 4M
+                    // texture, thus the drawcall count can be reduced to the same with
+                    // that use BMFont.
+                    // but there are some pitfalls with the global texture, e.g. it only
+                    // been release when sceen unloaded.
+                    // tf._label.cacheMode = 2;
+                    const n = tf.node;
+
+                    const wp = n.parent.convertToWorldSpaceAR(n.position);
+                    const np = tfParent.convertToNodeSpaceAR(wp);
+
+                    n.removeFromParent();
+                    tfParent.addChild(n);
+
+                    n.setPosition(np);
+                });
+            }
+        }
+
+        protected visit(o: GObject, visitFn: (o: GObject) => void) {
+            visitFn(o);
+            const comp = o.asCom;
+            if (comp) {
+                comp._children.forEach((child) => {
+                    this.visit(child, visitFn);
+                });
+            }
         }
 
         public setup_afterAdd(buffer: ByteBuffer, beginPos: number): void {

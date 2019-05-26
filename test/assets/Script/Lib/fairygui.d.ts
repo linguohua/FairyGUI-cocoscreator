@@ -496,6 +496,8 @@ declare namespace fgui {
         constructFromResource2(objectPool: Array<GObject>, poolIndex: number): void;
         protected constructExtension(buffer: ByteBuffer): void;
         protected onConstruct(): void;
+        protected foldTextFields(): void;
+        protected visit(o: GObject, visitFn: (o: GObject) => void): void;
         setup_afterAdd(buffer: ByteBuffer, beginPos: number): void;
         protected onEnable(): void;
         protected onDisable(): void;
