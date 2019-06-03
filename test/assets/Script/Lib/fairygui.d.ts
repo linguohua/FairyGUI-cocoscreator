@@ -668,6 +668,9 @@ declare namespace fgui {
         constructFromResource(): void;
         protected handleGrayedChanged(): void;
         setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void;
+        private static _graySpriteMaterial;
+        private static _spriteMaterial;
+        static switchGrayMaterial(useGrayMaterial: boolean, renderComp: cc.RenderComponent): void;
     }
 }
 declare namespace fgui {

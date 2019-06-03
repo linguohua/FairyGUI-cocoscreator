@@ -78,19 +78,11 @@ namespace fgui {
             else if (this.packageItem.scaleByTile)
                 this._content.type = cc.Sprite.Type.TILED;
             this._content.spriteFrame = <cc.SpriteFrame>this.packageItem.asset;
-            if (this._grayed) {
-                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-gray-sprite'));
-            } else {
-                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-sprite'));
-            }
+            GImage.switchGrayMaterial(this._grayed, this._content)
         }
 
         protected handleGrayedChanged(): void {
-            if (this._grayed) {
-                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-gray-sprite'));
-            } else {
-                (<any>(this._content)).setMaterial(0, (<any>cc).Material.getBuiltinMaterial('2d-sprite'));
-            }
+            GImage.switchGrayMaterial(this._grayed, this._content)
         }
 
         public setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void {
@@ -108,6 +100,31 @@ namespace fgui {
                 this._content.fillClockwise = buffer.readBool();
                 this._content.fillAmount = buffer.readFloat();
             }
+        }
+
+        private static _graySpriteMaterial;
+        private static _spriteMaterial;
+
+        public static switchGrayMaterial(useGrayMaterial: boolean, renderComp: cc.RenderComponent): void {
+            let material;
+            if (useGrayMaterial) {
+                material = this._graySpriteMaterial;
+                if (!material) {
+                    material = (<any>cc).Material.getBuiltinMaterial('gray-sprite');
+                }
+                material = this._graySpriteMaterial = (<any>cc).Material.getInstantiatedMaterial(material, renderComp);
+            }
+            else {
+                material = this._spriteMaterial;
+                if (!material) {
+                    material = (<any>cc).Material.getBuiltinMaterial('sprite', renderComp);
+                }
+                material = this._spriteMaterial = (<any>cc).Material.getInstantiatedMaterial(material, renderComp);
+                material.define('USE_TEXTURE', true);
+            }
+
+            material = (<any>cc).Material.getInstantiatedMaterial(material, renderComp);
+            (<any>renderComp).setMaterial(0, material);
         }
     }
 }

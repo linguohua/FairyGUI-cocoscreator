@@ -71,7 +71,8 @@ namespace fgui {
         }
 
         protected handleGrayedChanged(): void {
-            this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            // this._content.setState(this._grayed ? cc.Sprite.State.GRAY : cc.Sprite.State.NORMAL);
+            fgui.GImage.switchGrayMaterial(this._grayed, this._content);
         }
 
         public constructFromResource(): void {
