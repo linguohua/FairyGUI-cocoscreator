@@ -4322,7 +4322,7 @@ var fgui;
             for (var i = 0; i < cnt; i++) {
                 var child = this._parent.getChildAt(i);
                 if (child.group == this)
-                    child.node.active = child._finalVisible;
+                    child.handleVisibleChanged();
             }
         };
         GGroup.prototype.setup_beforeAdd = function (buffer, beginPos) {
@@ -7588,6 +7588,7 @@ var fgui;
             _this._touchDisabled = true;
             _this._text = "";
             _this._color = cc.Color.WHITE;
+            _this._strokeColor = cc.Color.BLACK;
             _this._templateVars = null;
             _this.createRenderer();
             _this.fontSize = 12;
@@ -7762,8 +7763,10 @@ var fgui;
                         this._outline.enabled = false;
                 }
                 else {
-                    if (!this._outline)
+                    if (!this._outline) {
                         this._outline = this._node.addComponent(cc.LabelOutline);
+                        this.updateStrokeColor();
+                    }
                     else
                         this._outline.enabled = true;
                     this._outline.width = value;
@@ -7774,15 +7777,14 @@ var fgui;
         });
         Object.defineProperty(GTextField.prototype, "strokeColor", {
             get: function () {
-                return this._outline ? this._outline.color : cc.Color.BLACK;
+                return this._strokeColor;
             },
             set: function (value) {
-                if (!this._outline) {
-                    this._outline = this._node.addComponent(cc.LabelOutline);
-                    this._outline.enabled = false;
+                if (this._strokeColor != value) {
+                    this._strokeColor = value;
+                    this.updateGear(4);
+                    this.updateStrokeColor();
                 }
-                this._outline.color = value;
-                this.updateGear(4);
             },
             enumerable: true,
             configurable: true
@@ -7917,25 +7919,37 @@ var fgui;
             }
         };
         GTextField.prototype.updateFontColor = function () {
-            var font = this._label.font;
-            if (font instanceof cc.BitmapFont) {
-                if (font._fntConfig.canTint)
-                    this._node.color = this._color;
-                else
-                    this._node.color = cc.Color.WHITE;
+            var c = this._color;
+            if (this._label) {
+                var font = this._label.font;
+                if ((font instanceof cc.BitmapFont) && !(font._fntConfig.canTint))
+                    c = cc.Color.WHITE;
             }
+            if (this._grayed)
+                c = fgui.ToolSet.toGrayed(c);
+            this._node.color = c;
+        };
+        GTextField.prototype.updateStrokeColor = function () {
+            if (!this._outline)
+                return;
+            if (this._grayed)
+                this._outline.color = fgui.ToolSet.toGrayed(this._strokeColor);
             else
-                this._node.color = this._color;
+                this._outline.color = this._strokeColor;
         };
         GTextField.prototype.updateFontSize = function () {
-            var fontSize = this._fontSize;
             var font = this._label.font;
             if (font instanceof cc.BitmapFont) {
                 if (!font._fntConfig.resizable)
-                    fontSize = font._fntConfig.fontSize;
+                    this._label.fontSize = font._fntConfig.fontSize;
+                else
+                    this._label.fontSize = this._fontSize;
+                this._label.lineHeight = font._fntConfig.fontSize + this._leading + 4;
             }
-            this._label.fontSize = fontSize;
-            this._label.lineHeight = fontSize + this._leading;
+            else {
+                this._label.fontSize = this._fontSize;
+                this._label.lineHeight = this._fontSize + this._leading;
+            }
         };
         GTextField.prototype.updateOverflow = function () {
             if (this._autoSize == fgui.AutoSizeType.Both)
@@ -7981,6 +7995,10 @@ var fgui;
             }
             else if (this._autoSize == fgui.AutoSizeType.Height)
                 this._node.width = this._width;
+        };
+        GTextField.prototype.handleGrayedChanged = function () {
+            this.updateFontColor();
+            this.updateStrokeColor();
         };
         GTextField.prototype.setup_beforeAdd = function (buffer, beginPos) {
             _super.prototype.setup_beforeAdd.call(this, buffer, beginPos);
@@ -8152,8 +8170,10 @@ var fgui;
                 text2 = "<i>" + text2 + "</i>";
             if (this._underline)
                 text2 = "<u>" + text2 + "</u>";
-            if (this._color)
-                text2 = "<color=" + this._color.toHEX("#rrggbb") + ">" + text2 + "</color>";
+            var c = this._color;
+            if (this._grayed)
+                c = fgui.ToolSet.toGrayed(c);
+            text2 = "<color=" + c.toHEX("#rrggbb") + ">" + text2 + "</color>";
             if (this._autoSize == fgui.AutoSizeType.Both) {
                 if (this._richText.maxWidth != 0)
                     this._richText.maxWidth = 0;
@@ -8170,8 +8190,8 @@ var fgui;
             else
                 this._richText.font = null;
         };
+        //不支持使用Node的颜色，等CCC支持后可以删掉这个函数
         GRichTextField.prototype.updateFontColor = function () {
-            //RichText 2.0.5还不支持使用Node的颜色
             this.updateText();
         };
         GRichTextField.prototype.updateFontSize = function () {
@@ -13980,7 +14000,7 @@ var fgui;
                     if (this._fillMethod != 0) {
                         this.type = cc.Sprite.Type.FILLED;
                         if (this._fillMethod <= 3)
-                            this.fillType = this._fillMethod;
+                            this.fillType = this._fillMethod - 1;
                         else
                             this.fillType = cc.Sprite.FillType.RADIAL;
                         this.fillCenter = new cc.Vec2(0.5, 0.5);
@@ -17380,6 +17400,10 @@ var fgui;
         ToolSet.getTime = function () {
             var currentTime = new Date();
             return currentTime.getMilliseconds() / 1000;
+        };
+        ToolSet.toGrayed = function (c) {
+            var v = c.getR() * 0.299 + c.getG() * 0.587 + c.getB() * 0.114;
+            return new cc.Color(v, v, v, c.getA());
         };
         return ToolSet;
     }());

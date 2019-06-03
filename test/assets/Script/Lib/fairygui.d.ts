@@ -377,7 +377,7 @@ declare namespace fgui {
         handlePositionChanged(): void;
         protected handleSizeChanged(): void;
         protected handleGrayedChanged(): void;
-        protected handleVisibleChanged(): void;
+        handleVisibleChanged(): void;
         hitTest(globalPt: cc.Vec2): GObject;
         constructFromResource(): void;
         setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void;
@@ -916,6 +916,7 @@ declare namespace fgui {
         protected _font: string;
         protected _fontSize: number;
         protected _color: cc.Color;
+        protected _strokeColor: cc.Color;
         protected _leading: number;
         protected _text: string;
         protected _ubbEnabled: boolean;
@@ -951,11 +952,13 @@ declare namespace fgui {
         protected updateText(): void;
         protected updateFont(value: string | cc.Font): void;
         protected updateFontColor(): void;
+        protected updateStrokeColor(): void;
         protected updateFontSize(): void;
         protected updateOverflow(): void;
         protected markSizeChanged(): void;
         protected onLabelSizeChanged(): void;
         protected handleSizeChanged(): void;
+        protected handleGrayedChanged(): void;
         setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void;
         setup_afterAdd(buffer: ByteBuffer, beginPos: number): void;
     }
@@ -2284,5 +2287,6 @@ declare namespace fgui {
         static clamp01(value: number): number;
         static lerp(start: number, end: number, percent: number): number;
         static getTime(): number;
+        static toGrayed(c: cc.Color): cc.Color;
     }
 }
